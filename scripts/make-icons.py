@@ -1,4 +1,4 @@
-"""Draw BeepBeep icons. The applied mark is a gold speech bubble saying beep-beep."""
+"""Draw BeepBeep icons. The applied mark is the gold barcode tile."""
 
 from pathlib import Path
 
@@ -62,19 +62,16 @@ def canvas(draw_fn, size: int) -> Image.Image:
 def main() -> None:
     ROOT.mkdir(parents=True, exist_ok=True)
     ART.mkdir(parents=True, exist_ok=True)
-    canvas(bubble, 192).save(ROOT / "pwa-192.png")
-    canvas(bubble, 512).save(ROOT / "pwa-512.png")
-    canvas(bubble, 180).save(ROOT / "apple-touch-icon.png")
-    mask = Image.new("RGB", (512, 512), GREEN)
+    canvas(barcode, 192).save(ROOT / "pwa-192.png")
+    canvas(barcode, 512).save(ROOT / "pwa-512.png")
+    canvas(barcode, 180).save(ROOT / "apple-touch-icon.png")
+    mask = Image.new("RGB", (512, 512), GOLD)
     draw = ImageDraw.Draw(mask)
-    scale = 512 / 64
-    def r(value: float) -> int:
-        return int(round(value * scale))
-    # Full-bleed green. The bubble sits inside the maskable safe zone.
-    rounded(draw, (r(14), r(16), r(50), r(40)), r(10), GOLD)
-    rounded(draw, (r(20), r(36), r(30), r(46)), r(3), GOLD)
-    rounded(draw, (r(24), r(22), r(29), r(34)), r(3), GREEN)
-    rounded(draw, (r(34), r(22), r(39), r(34)), r(3), DEEP)
+    def placed(value: float) -> int:
+        return int(round(80 + (value / 64) * 352))
+    bars = [(14, 18, 6, 28), (24, 12, 8, 40), (36, 20, 5, 24), (45, 16, 6, 32)]
+    for index, (x, y, bw, bh) in enumerate(bars):
+        rounded(draw, (placed(x), placed(y), placed(x + bw), placed(y + bh)), placed(3) - placed(0), DEEP if index % 2 else GREEN)
     mask.save(ROOT / "maskable-512.png")
 
     font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 28)

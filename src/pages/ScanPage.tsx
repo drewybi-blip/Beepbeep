@@ -150,19 +150,24 @@ export function ScanPage() {
         </section>
       ) : (
         <>
-          <img
-            src="/food/campaign-480.webp"
-            srcSet="/food/campaign-480.webp 480w, /food/campaign-960.webp 960w"
-            sizes="100vw"
-            alt="Scan it, save it, beep beep. Tomatoes, basil, avocado, citrus, mangoes, bread, loose penne and plain toilet paper."
-            width={960}
-            height={720}
-            decoding="async"
-            fetchPriority="high"
-            className="block aspect-[4/3] w-full object-cover"
-          />
+          <div className="relative aspect-[4/3] w-full">
+            <img
+              src="/food/campaign-480.webp"
+              srcSet="/food/campaign-480.webp 480w, /food/campaign-960.webp 960w"
+              sizes="100vw"
+              alt=""
+              width={960}
+              height={720}
+              decoding="async"
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <h1 className="font-display absolute inset-x-0 top-0 flex h-1/2 flex-col items-center justify-center px-3 text-center leading-[0.92] font-extrabold tracking-tight">
+              <span className="text-[clamp(1.35rem,6.6vw,2rem)] text-pine">SCAN IT, SAVE IT…</span>
+              <span className="text-[clamp(2rem,10vw,3.25rem)] text-gold">BEEP BEEP</span>
+            </h1>
+          </div>
           <main className="space-y-8 px-4 pt-4 pb-28">
-            <h1 className="sr-only">Scan it, save it, beep beep</h1>
             <Button type="button" size="lg" className="press glow w-full" onClick={() => void beginCamera()}>
               <Icon name="scan" size={22} />
               Scan barcode
