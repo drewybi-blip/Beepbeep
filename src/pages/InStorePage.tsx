@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Icon } from '../components/icons.tsx'
 import { arrangeForStore } from '../lib/store-mode.ts'
-import { listId, listSnapshot, toggleItem, useShoppingList } from '../lib/shopping.ts'
+import { listId, toggleItem, useLiveListSync, useShoppingList } from '../lib/shopping.ts'
 import type { ListItem } from '../lib/types.ts'
 
 type SharedList = { id: string; items: ListItem[] }
@@ -13,6 +13,7 @@ export function InStorePage() {
   const requested = params.listId || ownId
   const local = useShoppingList()
   const mine = requested === ownId
+  useLiveListSync()
   const [shared, setShared] = useState<ListItem[] | null>(null)
   const [offlineNote, setOfflineNote] = useState<string | null>(null)
   const [awake, setAwake] = useState<'on' | 'off' | 'unsupported'>('unsupported')
@@ -86,10 +87,16 @@ export function InStorePage() {
       toggleItem(id)
       return
     }
+    const who = localStorage.getItem('beepbeep.shopper') || 'Shopper'
     setShared((current) => {
-      const next = (current || []).map((item) => (item.id === id ? { ...item, checked: !item.checked } : item))
-      const payload = { ...listSnapshot(next), id: requested }
-      void fetch('/api/lists', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => undefined)
+      const target = (current || []).find((item) => item.id === id)
+      const checked = !target?.checked
+      const next = (current || []).map((item) => (item.id === id ? { ...item, checked, checkedBy: checked ? who : null, checkedAt: Date.now() } : item))
+      void fetch(`/api/lists/${requested}/tick`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId: id, checked, by: who }),
+      }).catch(() => undefined)
       return next
     })
   }
@@ -162,7 +169,7 @@ function StoreRow({ item, onTick }: { item: ListItem; onTick: () => void }) {
             {item.name}
           </span>
           <span className="mt-1 block text-sm font-bold text-muted">
-            {[item.aisle ? `Aisle ${item.aisle}` : null, item.brand].filter(Boolean).join(' · ') || 'No aisle on file'}
+            {item.checked && item.checkedBy ? `Ticked by ${item.checkedBy}` : [item.aisle ? `Aisle ${item.aisle}` : null, item.brand].filter(Boolean).join(' · ') || 'No aisle on file'}
           </span>
         </span>
       </button>

@@ -20,8 +20,8 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         display: 'standalone',
-        background_color: '#FFF8EE',
-        theme_color: '#FFF8EE',
+        background_color: '#FFFDF8',
+        theme_color: '#00843D',
         icons: [
           { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },
@@ -33,7 +33,7 @@ export default defineConfig({
         navigateFallback: 'index.html',
         runtimeCaching: [
           {
-            urlPattern: ({ url, request }) => request.method === 'GET' && url.pathname.startsWith('/api/lists/'),
+            urlPattern: ({ url, request }) => request.method === 'GET' && /^\/api\/lists\/[0-9a-f-]{36}$/i.test(url.pathname),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'shopmate-lists',

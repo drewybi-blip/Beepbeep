@@ -22,6 +22,7 @@ export type IconName =
   | 'baby'
   | 'booze'
   | 'back'
+  | 'share'
 
 export function Icon({ name, size = 24 }: { name: IconName; size?: number }) {
   return (
@@ -49,7 +50,7 @@ const glyphs: Record<IconName, ReactNode> = {
     <>
       <path d="M6 12h20l-2 12H8L6 12z" {...stroke} />
       <path d="M12 12c0-4 2-6 4-6s4 2 4 6" {...stroke} />
-      <circle cx="13" cy="18" r="1.2" fill="#FFC20E" />
+      <circle cx="13" cy="18" r="1.2" fill="#FFCD00" />
     </>
   ),
   list: (
@@ -67,7 +68,7 @@ const glyphs: Record<IconName, ReactNode> = {
   tag: (
     <>
       <path d="M6 16L16 6h8v8L14 24 6 16z" {...stroke} />
-      <circle cx="20" cy="12" r="1.4" fill="#FFC20E" />
+      <circle cx="20" cy="12" r="1.4" fill="#FFCD00" />
     </>
   ),
   fire: (
@@ -152,6 +153,14 @@ const glyphs: Record<IconName, ReactNode> = {
     </>
   ),
   back: <path d="M19 8l-8 8 8 8" {...stroke} />,
+  share: (
+    <>
+      <circle cx="23" cy="8" r="3" {...stroke} />
+      <circle cx="9" cy="16" r="3" {...stroke} />
+      <circle cx="23" cy="24" r="3" {...stroke} />
+      <path d="M12 15l8-5M12 17l8 5" {...stroke} />
+    </>
+  ),
 }
 
 export const PANTRY = [

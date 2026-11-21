@@ -12,9 +12,9 @@ export function SpecialBanner({ records, barcodes }: { records: PriceRecord[]; b
   const first = fresh[0]
   const name = first.record.name || first.store.productName || first.record.barcode
   return (
-    <div className="relative overflow-hidden rounded-[24px] bg-gold px-4 py-4 text-pine shadow-[4px_4px_0_#0e3b2e]">
+    <div className="relative overflow-hidden rounded-[24px] bg-gold px-4 py-4 text-pine shadow-[0_12px_32px_rgba(255,194,14,0.35)]">
       <Confetti />
-      <p className="sticker bg-pink px-2 py-0.5 text-[11px] font-black uppercase tracking-[0.12em] text-white">On special</p>
+      <p className="sticker bg-leaf px-2 py-0.5 text-[11px] font-black uppercase tracking-[0.12em] text-white">On special</p>
       <p className="mt-1 text-lg font-extrabold leading-tight">
         {name} is {first.store.price != null ? aud(first.store.price) : 'on special'} at {STORE_LABELS[first.store.store]}
         {first.store.wasPrice ? `, down from ${aud(first.store.wasPrice)}` : ''}.

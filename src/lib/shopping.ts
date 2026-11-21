@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 import type { ListItem, ProductView, ResearchedItem } from './types.ts'
 
 const KEY = 'shopmate.list.v1'
@@ -30,7 +30,24 @@ export function loadList() {
 }
 
 function normalise(item: ListItem): ListItem {
-  return { ...item, store: item.store ?? null, aisle: item.aisle ?? null }
+  return {
+    ...item,
+    store: item.store ?? null,
+    aisle: item.aisle ?? null,
+    checkedBy: item.checkedBy ?? null,
+    checkedAt: item.checkedAt ?? 0,
+    addedBy: item.addedBy ?? null,
+  }
+}
+
+const ADDS_KEY = 'shopmate.list-adds.v1'
+
+export function allowsAdds() {
+  try {
+    return localStorage.getItem(ADDS_KEY) === '1'
+  } catch {
+    return false
+  }
 }
 
 export function listId() {
@@ -51,11 +68,15 @@ export function listSnapshot(items: ListItem[], estimate: number | null = null) 
     updatedAt: new Date().toISOString(),
     currency: 'AUD',
     estimate,
+    allowAdds: allowsAdds(),
     items: items.map((item) => ({
       id: item.id,
       name: item.name,
       quantity: item.quantity,
       checked: item.checked,
+      checkedBy: item.checkedBy,
+      checkedAt: item.checkedAt,
+      addedBy: item.addedBy,
       barcode: item.barcode,
       brand: item.brand,
       store: item.store,
@@ -115,11 +136,11 @@ export function addProductToList(product: ProductView | ResearchedItem, place?: 
   const items = loadList()
   const existing = items.find((item) => item.barcode === barcode)
   if (existing) {
-    write(items.map((item) => (item.id === existing.id ? { ...item, quantity: item.quantity + 1, checked: false, store: store || item.store, aisle: aisle || item.aisle } : item)))
+    write(items.map((item) => (item.id === existing.id ? { ...item, quantity: item.quantity + 1, checked: false, checkedBy: null, checkedAt: Date.now(), store: store || item.store, aisle: aisle || item.aisle } : item)))
     return
   }
   write([
-    { id: crypto.randomUUID(), barcode, name, brand, image, quantity: 1, checked: false, addedAt: Date.now(), store, aisle },
+    { id: crypto.randomUUID(), barcode, name, brand, image, quantity: 1, checked: false, checkedBy: null, checkedAt: 0, addedBy: 'owner', addedAt: Date.now(), store, aisle },
     ...items,
   ])
 }
@@ -128,7 +149,7 @@ export function addFreeText(name: string) {
   const trimmed = name.trim()
   if (!trimmed) return
   write([
-    { id: crypto.randomUUID(), barcode: null, name: trimmed, brand: null, image: null, quantity: 1, checked: false, addedAt: Date.now(), store: null, aisle: null },
+    { id: crypto.randomUUID(), barcode: null, name: trimmed, brand: null, image: null, quantity: 1, checked: false, checkedBy: null, checkedAt: 0, addedBy: 'owner', addedAt: Date.now(), store: null, aisle: null },
     ...loadList(),
   ])
 }
@@ -138,8 +159,12 @@ export function setQuantity(id: string, quantity: number) {
   write(loadList().map((item) => (item.id === id ? { ...item, quantity: next } : item)))
 }
 
-export function toggleItem(id: string) {
-  write(loadList().map((item) => (item.id === id ? { ...item, checked: !item.checked } : item)))
+export function toggleItem(id: string, by = 'You') {
+  write(loadList().map((item) => {
+    if (item.id !== id) return item
+    const checked = !item.checked
+    return { ...item, checked, checkedBy: checked ? by : null, checkedAt: Date.now() }
+  }))
 }
 
 export function removeItem(id: string) {
@@ -148,4 +173,92 @@ export function removeItem(id: string) {
 
 export function clearTicked() {
   write(loadList().filter((item) => !item.checked))
+}
+
+export function setAllowsAdds(on: boolean) {
+  try {
+    localStorage.setItem(ADDS_KEY, on ? '1' : '0')
+  } catch {
+    /* private mode */
+  }
+  queueSync(loadList())
+}
+
+export async function publishList() {
+  const payload = listSnapshot(loadList())
+  await rememberOffline(payload)
+  const response = await fetch('/api/lists', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  if (!response.ok) throw new Error('The list could not be published.')
+  return payload.id
+}
+
+type RemoteList = { allowAdds?: boolean; items?: ListItem[] }
+
+export function applyRemoteList(remote: RemoteList) {
+  if (typeof remote.allowAdds === 'boolean') {
+    try {
+      localStorage.setItem(ADDS_KEY, remote.allowAdds ? '1' : '0')
+    } catch {
+      /* ignore */
+    }
+  }
+  const local = loadList()
+  const remoteItems = (remote.items || []).map(normalise)
+  const remoteById = new Map(remoteItems.map((item) => [item.id, item]))
+  const localIds = new Set(local.map((item) => item.id))
+  let changed = false
+  const next = local.map((item) => {
+    const other = remoteById.get(item.id)
+    if (!other) return item
+    if ((other.checkedAt || 0) > (item.checkedAt || 0) && (other.checked !== item.checked || other.checkedBy !== item.checkedBy)) {
+      changed = true
+      return { ...item, checked: other.checked, checkedBy: other.checkedBy, checkedAt: other.checkedAt }
+    }
+    return item
+  })
+  for (const other of remoteItems) {
+    if (!localIds.has(other.id) && other.addedBy && other.addedBy !== 'owner') {
+      changed = true
+      next.push(other)
+    }
+  }
+  if (changed) write(next)
+}
+
+export function useLiveListSync() {
+  useEffect(() => {
+    const id = listId()
+    if (!id || id === 'local-list') return
+    let source: EventSource | null = null
+    const pull = () => {
+      void fetch(`/api/lists/${id}`)
+        .then((response) => (response.ok ? response.json() : null))
+        .then((body: RemoteList | null) => {
+          if (body) applyRemoteList(body)
+        })
+        .catch(() => undefined)
+    }
+    try {
+      source = new EventSource(`/api/lists/${id}/events`)
+      source.onmessage = (event) => {
+        try {
+          applyRemoteList(JSON.parse(event.data) as RemoteList)
+        } catch {
+          /* ignore a bad event */
+        }
+      }
+    } catch {
+      /* polling covers it */
+    }
+    const timer = window.setInterval(pull, 3000)
+    pull()
+    return () => {
+      source?.close()
+      window.clearInterval(timer)
+    }
+  }, [])
 }

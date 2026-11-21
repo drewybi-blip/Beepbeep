@@ -6,6 +6,7 @@ import { ProductPage } from './pages/ProductPage.tsx'
 import { ResearchedPage } from './pages/ResearchedPage.tsx'
 import { InStorePage } from './pages/InStorePage.tsx'
 import { ScanPage } from './pages/ScanPage.tsx'
+import { SharedListPage } from './pages/SharedListPage.tsx'
 import { ShoppingPage } from './pages/ShoppingPage.tsx'
 import { WelcomePage } from './pages/WelcomePage.tsx'
 import { cn } from './lib/utils.ts'
@@ -16,7 +17,8 @@ function Shell() {
     window.addEventListener('pointerdown', unlock)
     return () => window.removeEventListener('pointerdown', unlock)
   }, [])
-  const inStore = useLocation().pathname.startsWith('/store')
+  const path = useLocation().pathname
+  const inStore = path.startsWith('/store') || path.startsWith('/l/')
   const tabs: { to: string; label: string; icon: IconName; end: boolean }[] = [
     { to: '/', label: 'Home', icon: 'scan', end: true },
     { to: '/researched', label: 'Researched', icon: 'star', end: false },
@@ -62,6 +64,7 @@ export default function App() {
         <Route path="product/:code" element={<ProductPage />} />
         <Route path="researched" element={<ResearchedPage />} />
         <Route path="list" element={<ShoppingPage />} />
+        <Route path="l/:listId" element={<SharedListPage />} />
         <Route path="store" element={<InStorePage />} />
         <Route path="store/:listId" element={<InStorePage />} />
       </Route>

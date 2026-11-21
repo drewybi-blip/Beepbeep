@@ -11,6 +11,26 @@ const EMPTY = { devices: {}, prices: {}, upc: {}, lists: {} }
 let state = structuredClone(EMPTY)
 let loaded = false
 let writing = Promise.resolve()
+const listListeners = new Map()
+
+export function subscribeList(id, listener) {
+  const key = String(id).toLowerCase()
+  if (!listListeners.has(key)) listListeners.set(key, new Set())
+  listListeners.get(key).add(listener)
+  return () => listListeners.get(key)?.delete(listener)
+}
+
+function notifyList(list) {
+  const set = listListeners.get(String(list.id).toLowerCase())
+  if (!set) return
+  for (const listener of set) {
+    try {
+      listener(list)
+    } catch {
+      /* a dropped stream should not stop the others */
+    }
+  }
+}
 
 async function load() {
   if (loaded) return
@@ -106,12 +126,14 @@ export function listSpecials() {
 }
 
 export function getList(id) {
-  return state.lists?.[id] || null
+  const key = String(id)
+  return state.lists?.[key] || state.lists?.[key.toLowerCase()] || null
 }
 
 export function saveList(list) {
   if (!state.lists) state.lists = {}
   state.lists[list.id] = list
+  notifyList(list)
   void persist()
 }
 

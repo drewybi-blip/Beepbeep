@@ -8,11 +8,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-gold text-pine shadow-[0_10px_24px_rgba(255,194,14,0.35)] hover:bg-gold-deep',
+        default: 'bg-gold text-pine shadow-[0_10px_28px_rgba(255,194,14,0.45)] hover:bg-gold-deep',
         secondary: 'bg-white text-pine shadow-[0_8px_24px_rgba(20,48,40,0.06)] ring-1 ring-line hover:bg-gold-soft',
         ghost: 'bg-transparent text-pine hover:bg-white/70',
         sale: 'bg-sale text-white hover:opacity-90',
-        pine: 'bg-pine text-gold shadow-soft hover:bg-leaf',
+        pine: 'bg-fresh text-white shadow-[0_12px_28px_rgba(47,191,120,0.35)] hover:brightness-105',
       },
       size: {
         default: 'h-12 px-5 text-base',

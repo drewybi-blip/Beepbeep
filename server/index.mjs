@@ -4,7 +4,8 @@ import http from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { enqueue, isPending, pendingList, startScheduler } from './jobs.mjs'
-import { getDevice, getList, getPrice, getUpc, isFresh, listSpecials, ready, saveDevice, saveList, saveUpc } from './store.mjs'
+import { applyAdd, applyTick, isListId, mergeOwnerList } from './share.mjs'
+import { getDevice, getList, getPrice, getUpc, isFresh, listSpecials, ready, saveDevice, saveList, saveUpc, subscribeList } from './store.mjs'
 import { buildApplePass, googleSaveUrl, walletStatus } from './wallet.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -188,29 +189,72 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/lists' && req.method === 'POST') {
       const body = await readBody(req)
-      if (!UUID.test(body.id || '')) {
+      if (!isListId(body.id)) {
         send(res, 400, { error: 'List id must be a UUID.' })
         return
       }
-      const items = (Array.isArray(body.items) ? body.items : []).slice(0, 80).map((item) => ({
-        id: String(item.id || '').slice(0, 80),
-        name: String(item.name || '').slice(0, 160),
-        quantity: Math.min(99, Math.max(1, Number(item.quantity) || 1)),
-        checked: Boolean(item.checked),
-        barcode: item.barcode ? String(item.barcode).slice(0, 80) : null,
-        brand: item.brand ? String(item.brand).slice(0, 120) : null,
-        store: item.store ? String(item.store).slice(0, 40) : null,
-        aisle: item.aisle ? String(item.aisle).slice(0, 40) : null,
-      })).filter((item) => item.id && item.name)
-      const list = {
-        id: body.id,
-        updatedAt: new Date().toISOString(),
-        currency: 'AUD',
-        estimate: typeof body.estimate === 'number' ? body.estimate : null,
-        items,
-      }
+      const list = mergeOwnerList(getList(body.id), { ...body, items: Array.isArray(body.items) ? body.items.slice(0, 80) : [] })
       saveList(list)
       send(res, 200, list)
+      return
+    }
+    const eventsMatch = url.pathname.match(/^\/api\/lists\/([0-9a-f-]{36})\/events$/i)
+    if (eventsMatch && req.method === 'GET') {
+      const id = eventsMatch[1]
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+      })
+      const current = getList(id)
+      if (current) res.write(`data: ${JSON.stringify(current)}\n\n`)
+      const unsubscribe = subscribeList(id, (list) => {
+        res.write(`data: ${JSON.stringify(list)}\n\n`)
+      })
+      const ping = setInterval(() => res.write(': ping\n\n'), 15000)
+      req.on('close', () => {
+        clearInterval(ping)
+        unsubscribe()
+      })
+      return
+    }
+    const tickMatch = url.pathname.match(/^\/api\/lists\/([0-9a-f-]{36})\/tick$/i)
+    if (tickMatch && req.method === 'POST') {
+      const list = getList(tickMatch[1])
+      if (!list) {
+        send(res, 404, { error: 'List not found' })
+        return
+      }
+      const body = await readBody(req)
+      const next = applyTick(list, body)
+      if (!next) {
+        send(res, 404, { error: 'Item not found' })
+        return
+      }
+      saveList(next)
+      send(res, 200, next)
+      return
+    }
+    const addMatch = url.pathname.match(/^\/api\/lists\/([0-9a-f-]{36})\/items$/i)
+    if (addMatch && req.method === 'POST') {
+      const list = getList(addMatch[1])
+      if (!list) {
+        send(res, 404, { error: 'List not found' })
+        return
+      }
+      const body = await readBody(req)
+      const result = applyAdd(list, body)
+      if (result.error === 'adds-closed') {
+        send(res, 403, { error: 'The sender hasn’t allowed extra items.' })
+        return
+      }
+      if (result.error) {
+        send(res, 400, { error: 'Add a name.' })
+        return
+      }
+      saveList(result.list)
+      send(res, 200, result.list)
       return
     }
     const listMatch = url.pathname.match(/^\/api\/lists\/([0-9a-f-]{36})$/i)

@@ -99,6 +99,9 @@ export type ListItem = {
   image: string | null
   quantity: number
   checked: boolean
+  checkedBy: string | null
+  checkedAt: number
+  addedBy: string | null
   addedAt: number
   store: string | null
   aisle: string | null

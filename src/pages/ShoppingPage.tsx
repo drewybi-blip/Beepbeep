@@ -9,13 +9,16 @@ import { Button } from '../components/ui/button.tsx'
 import { Input } from '../components/ui/input.tsx'
 import { aud } from '../lib/format.ts'
 import { lowestPrice, usePrices } from '../lib/prices.ts'
-import { addFreeText, clearTicked, removeItem, setQuantity, toggleItem, useShoppingList } from '../lib/shopping.ts'
+import { ShareSheet } from '../components/ShareSheet.tsx'
+import { addFreeText, clearTicked, removeItem, setQuantity, toggleItem, useLiveListSync, useShoppingList } from '../lib/shopping.ts'
 import { Confetti } from '../components/Confetti.tsx'
 
 export function ShoppingPage() {
   const items = useShoppingList()
   const { prices } = usePrices()
   const [draft, setDraft] = useState('')
+  const [share, setShare] = useState(false)
+  useLiveListSync()
   const open = items.filter((item) => !item.checked)
   const estimate = useMemo(() => {
     const values = open.map((item) => {
@@ -32,9 +35,12 @@ export function ShoppingPage() {
       <TopBar title="Shopping list" />
       <main className="space-y-4 px-4 pb-28">
         <p className="font-semibold text-muted">Tick them off as you wander the aisles. This list stays on your phone, even with no reception.</p>
-        <Link to="/store" className="press flex h-14 items-center justify-center gap-2 rounded-full bg-pine text-lg font-bold text-gold shadow-soft">
+        <Link to="/store" className="press flex h-14 items-center justify-center gap-2 rounded-full bg-leaf text-lg font-bold text-white shadow-[0_12px_28px_rgba(0,132,61,0.28)]">
           <Icon name="store" size={22} /> In-store mode
         </Link>
+        <button type="button" className="press flex h-14 w-full items-center justify-center gap-2 rounded-full bg-gold text-lg font-extrabold text-pine shadow-[0_12px_28px_rgba(255,205,0,0.45)]" onClick={() => setShare(true)}>
+          <Icon name="share" size={22} /> Share list
+        </button>
         <InstallHint />
         <WalletButtons />
         <SpecialBanner records={Object.values(prices)} barcodes={new Set(items.map((item) => item.barcode).filter((code): code is string => Boolean(code)))} />
@@ -78,7 +84,7 @@ export function ShoppingPage() {
                     <div className="min-w-0 flex-1">
                       <p className={`font-display text-lg leading-tight font-bold ${item.checked ? 'line-through' : ''}`}>{item.name}</p>
                       <p className="text-xs font-semibold text-muted">
-                        {item.brand || 'Typed in'}
+                        {item.checked && item.checkedBy ? `Ticked by ${item.checkedBy}` : item.addedBy && item.addedBy !== 'owner' ? `Added by ${item.addedBy}` : item.brand || 'Typed in'}
                         {price != null ? ` · from ${aud(price)}` : ''}
                       </p>
                       <div className="mt-2 flex items-center gap-2">
@@ -97,7 +103,7 @@ export function ShoppingPage() {
         {items.length > 0 && open.length === 0 ? (
           <div className="relative overflow-hidden rounded-3xl bg-lime px-4 py-6 text-center">
             <Confetti />
-            <p className="font-display relative text-2xl font-bold text-pine">List done. Nice trolley.</p>
+            <p className="font-display relative text-2xl font-bold text-pine">Shopping done!</p>
           </div>
         ) : null}
         {items.some((item) => item.checked) ? (
@@ -110,6 +116,7 @@ export function ShoppingPage() {
           <span className="font-extrabold">{estimate != null ? `from ${aud(estimate)}` : 'Add a scan for prices'}</span>
         </div>
       </div>
+      <ShareSheet open={share} onOpenChange={setShare} />
     </div>
   )
 }

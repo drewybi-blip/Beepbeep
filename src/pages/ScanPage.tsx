@@ -136,9 +136,9 @@ export function ScanPage() {
             <div className="relative aspect-[3/4] bg-black">
               <video ref={videoRef} className="h-full w-full object-cover" muted playsInline autoPlay />
               <div className="pointer-events-none absolute inset-6 rounded-3xl border-2 border-gold/80" />
-              <div className="scan-line pointer-events-none absolute right-8 left-8 h-0.5 bg-gold shadow-[0_0_16px_#FFC20E]" />
+              <div className="scan-line pointer-events-none absolute right-8 left-8 h-0.5 bg-gold shadow-[0_0_16px_#FFCD00]" />
               {pop ? (
-                <p className="pop-in absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-lime px-4 py-2 text-base font-bold text-pine" role="status">
+                <p className="pop-in absolute bottom-6 left-1/2 rounded-full bg-gold px-4 py-2 text-base font-bold text-pine" role="status">
                   Beep. Got it.
                 </p>
               ) : null}
