@@ -150,28 +150,33 @@ export function ScanPage() {
         </section>
       ) : (
         <>
-          <div className="relative aspect-[4/3] w-full">
+          <div className="relative w-full">
             <img
-              src="/food/campaign-480.webp"
-              srcSet="/food/campaign-480.webp 480w, /food/campaign-960.webp 960w"
+              src="/food/campaign-960.webp"
+              srcSet="/food/campaign-480.webp 480w, /food/campaign-960.webp 960w, /food/campaign-1400.webp 1400w"
               sizes="100vw"
               alt=""
-              width={960}
-              height={720}
+              width={1152}
+              height={1424}
               decoding="async"
               fetchPriority="high"
-              className="absolute inset-0 h-full w-full object-cover"
+              className="block h-auto w-full"
             />
-            <h1 className="font-display absolute inset-x-0 top-0 flex h-1/2 flex-col items-center justify-center px-3 text-center leading-[0.92] font-extrabold tracking-tight">
+            <h1 className="font-display absolute inset-x-0 top-0 flex h-[46%] flex-col items-center justify-center px-4 text-center leading-[0.92] font-extrabold tracking-tight">
               <span className="text-[clamp(1.7rem,8vw,2.4rem)] text-pine">SCAN, SAVE, SHOP</span>
               <span className="text-[clamp(2rem,10vw,3.25rem)] text-gold">BEEP BEEP</span>
             </h1>
           </div>
           <main className="space-y-8 px-4 pt-4 pb-28">
-            <Button type="button" size="lg" className="press glow w-full" onClick={() => void beginCamera()}>
-              <Icon name="scan" size={22} />
-              Scan barcode
-            </Button>
+            <div className="space-y-3">
+              <Button type="button" size="lg" className="press glow w-full" onClick={() => void beginCamera()}>
+                <Icon name="scan" size={22} />
+                SCAN BARCODE
+              </Button>
+              <Button type="button" variant="secondary" className="press w-full border-2 border-leaf bg-transparent text-leaf shadow-none ring-0" onClick={() => setManual(true)}>
+                MANUAL ENTRY
+              </Button>
+            </div>
             <p className="max-w-[32ch] text-base text-pine/80">
               Line up the barcode. We’ll beep, then show the product and today’s shelf price.
             </p>
@@ -215,9 +220,6 @@ export function ScanPage() {
                 </div>
               )}
             </section>
-            <button type="button" onClick={() => setManual(true)} className="block text-sm font-extrabold text-leaf">
-              Type the barcode
-            </button>
             <button type="button" onClick={() => uploadRef.current?.click()} className="block text-sm font-semibold text-muted">
               Upload a photo of the barcode
             </button>
