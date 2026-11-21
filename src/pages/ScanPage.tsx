@@ -157,14 +157,14 @@ export function ScanPage() {
               sizes="100vw"
               alt=""
               width={1152}
-              height={1424}
+              height={738}
               decoding="async"
               fetchPriority="high"
               className="block h-auto w-full"
             />
-            <h1 className="font-display absolute inset-x-0 top-0 flex h-[46%] flex-col items-center justify-center px-4 text-center leading-[0.92] font-extrabold tracking-tight">
-              <span className="text-[clamp(1.7rem,8vw,2.4rem)] text-pine">SCAN, SAVE, SHOP</span>
-              <span className="text-[clamp(2rem,10vw,3.25rem)] text-gold">BEEP BEEP</span>
+            <h1 className="font-display absolute inset-x-0 top-0 flex h-[36%] flex-col items-center justify-end px-3 pb-1 text-center leading-[0.9] font-[900] tracking-tight">
+              <span className="text-[clamp(1.85rem,8.6vw,2.5rem)] text-pine">SCAN, SAVE, SHOP</span>
+              <span className="banner-beep text-[clamp(2.35rem,11.5vw,3.4rem)]">BEEP BEEP</span>
             </h1>
           </div>
           <main className="space-y-8 px-4 pt-4 pb-28">
