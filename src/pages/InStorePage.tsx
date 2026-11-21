@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { Icon } from '../components/icons.tsx'
 import { arrangeForStore } from '../lib/store-mode.ts'
 import { listId, listSnapshot, toggleItem, useShoppingList } from '../lib/shopping.ts'
 import type { ListItem } from '../lib/types.ts'
@@ -97,10 +98,10 @@ export function InStorePage() {
     <div className="min-h-dvh bg-paper px-4 pt-4 pb-8">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="sticker bg-lime px-3 py-1 text-xs font-black uppercase tracking-wide text-pine">In-store mode</p>
-          <h1 className="mt-3 text-3xl font-black leading-none text-pine">Tick it off</h1>
+          <p className="tag-strip bg-lime text-pine">In-store mode</p>
+          <h1 className="font-display mt-4 text-[32px] leading-none font-extrabold text-pine">Tick it off</h1>
         </div>
-        <Link to="/list" className="rounded-full bg-white px-4 py-2 text-sm font-black text-pine ring-1 ring-line">
+        <Link to="/list" className="press rounded-full bg-white px-4 py-2 text-sm font-semibold text-pine shadow-soft">
           Done
         </Link>
       </div>
@@ -110,12 +111,16 @@ export function InStorePage() {
       {offlineNote ? <p className="mt-2 text-sm font-bold text-gold-ink">{offlineNote}</p> : null}
 
       {!items.length ? (
-        <p className="mt-8 rounded-[28px] bg-white p-6 text-center text-lg font-black">Nothing on this list yet.</p>
+        <div className="mt-8 rounded-3xl bg-white px-6 py-10 text-center shadow-soft">
+          <span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gold text-pine"><Icon name="basket" size={32} /></span>
+          <p className="font-display mt-4 text-2xl font-bold">Nothing to tick</p>
+          <p className="mt-2 text-sm text-muted">Add a few things, then come back and beep through the aisle.</p>
+        </div>
       ) : (
         <div className="mt-5 space-y-5">
           {groups.map((group) => (
             <section key={group.store}>
-              <h2 className="mb-2 text-sm font-black uppercase tracking-[0.14em] text-gold-ink">{group.store}</h2>
+              <h2 className="mb-2 flex items-center gap-2 text-sm font-bold tracking-wide text-gold-ink uppercase"><Icon name="store" size={16} /> {group.store}</h2>
               <ul className="space-y-3">
                 {group.items.map((item) => (
                   <StoreRow key={item.id} item={item} onTick={() => tick(item.id)} />
@@ -146,13 +151,13 @@ function StoreRow({ item, onTick }: { item: ListItem; onTick: () => void }) {
         type="button"
         onClick={onTick}
         aria-pressed={item.checked}
-        className="flex min-h-20 w-full items-center gap-4 rounded-[28px] bg-white px-3 py-3 text-left shadow-[0_8px_24px_rgba(20,48,40,0.06)]"
+        className="press flex min-h-20 w-full items-center gap-4 rounded-3xl bg-white px-3 py-3 text-left shadow-soft"
       >
-        <span className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 text-2xl font-black ${item.checked ? 'border-pine bg-gold text-pine' : 'border-line bg-paper text-transparent'}`}>
-          ✓
+        <span className={`grid h-16 w-16 shrink-0 place-items-center rounded-full border-4 ${item.checked ? 'border-pine bg-gold text-pine' : 'border-line bg-paper text-transparent'}`}>
+          <Icon name="tick" size={28} />
         </span>
         <span className="min-w-0">
-          <span className={`block text-xl font-black leading-tight ${item.checked ? 'line-through' : ''}`}>
+          <span className={`font-display block text-xl font-bold leading-tight ${item.checked ? 'line-through' : ''}`}>
             {item.quantity > 1 ? `${item.quantity} × ` : ''}
             {item.name}
           </span>

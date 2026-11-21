@@ -21,6 +21,7 @@ export type IconName =
   | 'pet'
   | 'baby'
   | 'booze'
+  | 'back'
 
 export function Icon({ name, size = 24 }: { name: IconName; size?: number }) {
   return (
@@ -150,6 +151,7 @@ const glyphs: Record<IconName, ReactNode> = {
       <path d="M12 26h8" {...stroke} />
     </>
   ),
+  back: <path d="M19 8l-8 8 8 8" {...stroke} />,
 }
 
 export const PANTRY = [

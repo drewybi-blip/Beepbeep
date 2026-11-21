@@ -1,5 +1,5 @@
-import { Volume2, VolumeX } from 'lucide-react'
 import { useSyncExternalStore } from 'react'
+import { Icon } from './icons.tsx'
 import { setSoundEnabled, soundEnabled, subscribeSound } from '../lib/sound.ts'
 
 export function SoundToggle() {
@@ -10,9 +10,9 @@ export function SoundToggle() {
       aria-pressed={on}
       aria-label={on ? 'Sound on. Turn scanner beep off' : 'Sound off. Turn scanner beep on'}
       onClick={() => setSoundEnabled(!on)}
-      className="ml-auto flex h-10 w-10 items-center justify-center rounded-full bg-white text-pine shadow-sm ring-1 ring-line"
+      className={`press ml-auto flex h-10 w-10 items-center justify-center rounded-full shadow-soft ${on ? 'bg-gold text-pine' : 'bg-white text-muted'}`}
     >
-      {on ? <Volume2 size={18} /> : <VolumeX size={18} />}
+      <Icon name="sound" size={20} />
     </button>
   )
 }

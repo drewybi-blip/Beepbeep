@@ -166,11 +166,11 @@ export function ScanPage() {
                 <Icon name="scan" size={36} />
               </span>
             </div>
-            <Button type="button" size="lg" className="press mt-6 w-full bg-pine text-gold shadow-soft hover:bg-leaf" onClick={() => void beginCamera()}>
+              <Button type="button" size="lg" variant="pine" className="press mt-6 w-full" onClick={() => void beginCamera()}>
               <Icon name="scan" size={22} />
               Start camera
             </Button>
-            {specials && specials.length > 0 ? (
+            {specials?.some((item) => item.image) ? (
               <div className="mt-8 flex items-end justify-center">
                 {specials.slice(0, 3).map((item, index) => (
                   <Link

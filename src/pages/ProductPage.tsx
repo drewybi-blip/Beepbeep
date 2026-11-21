@@ -1,6 +1,6 @@
-import { ShoppingBag } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { Icon } from '../components/icons.tsx'
 import { ProductView } from '../components/ProductView.tsx'
 import { TopBar } from '../components/TopBar.tsx'
 import { Button } from '../components/ui/button.tsx'
@@ -44,10 +44,11 @@ export function ProductPage() {
     <div>
       <TopBar back title="BeepBeep" />
       {!product && !error ? (
-        <div className="space-y-4 px-4">
-          <div className="h-72 animate-pulse rounded-[32px] bg-white" />
-          <div className="h-28 animate-pulse rounded-[28px] bg-white" />
-          <p className="font-black text-gold-ink">Rummaging through the open catalogues…</p>
+        <div className="space-y-4 px-4" aria-busy="true">
+          <div className="h-72 animate-pulse rounded-3xl bg-white shadow-soft" />
+          <div className="h-16 animate-pulse rounded-2xl bg-white" />
+          <div className="h-24 animate-pulse rounded-3xl bg-white" />
+          <p className="text-sm font-semibold text-gold-ink">Rummaging through the open catalogues…</p>
         </div>
       ) : null}
       {error ? <p className="mx-4 rounded-[24px] bg-white p-5 font-bold text-sale">{error}</p> : null}
@@ -57,14 +58,15 @@ export function ProductPage() {
           <Button
             type="button"
             size="lg"
-            className={`w-full ${wiggle ? 'wiggle' : ''}`}
+            variant="pine"
+            className={`press w-full ${wiggle ? 'wiggle' : ''}`}
             onClick={() => {
               addProductToList(product, preferredPlace(prices[product.code]))
               setWiggle(true)
               window.setTimeout(() => setWiggle(false), 500)
             }}
           >
-            <ShoppingBag />
+            <Icon name="basket" size={22} />
             {onList ? 'Add another' : 'Add to list'}
           </Button>
         </div>

@@ -1,12 +1,12 @@
 import { Icon } from '../components/icons.tsx'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { PriceStack, quoteBadge } from '../components/Prices.tsx'
+import { PriceStack } from '../components/Prices.tsx'
 import { SpecialBanner } from '../components/SpecialBanner.tsx'
 import { TopBar } from '../components/TopBar.tsx'
 import { Button } from '../components/ui/button.tsx'
 import { Sheet } from '../components/ui/dialog.tsx'
-import { aud, scannedOn, STORE_LABELS } from '../lib/format.ts'
+import { aud, scannedOn } from '../lib/format.ts'
 import { usePrices } from '../lib/prices.ts'
 import { clearResearched, removeResearched, useResearched } from '../lib/researched.ts'
 import { preferredPlace } from '../lib/prices.ts'
@@ -34,16 +34,11 @@ export function ResearchedPage() {
         <p className="font-semibold text-muted">Your little pantry of discoveries, saved on this phone.</p>
         <SpecialBanner records={records} />
         {offline ? <p className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-sale">Price check is offline. Your researched products are still here.</p> : null}
-        <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => setOnlySpecial((value) => !value)}
-            className={`rounded-full px-4 py-2 text-sm font-extrabold ${onlySpecial ? 'bg-sale text-white' : 'bg-white text-pine ring-1 ring-line'}`}
-          >
-            On special{specials.length ? ` · ${specials.length}` : ''}
-          </button>
+        <div className="no-scrollbar -mx-4 flex items-center gap-2 overflow-x-auto px-4">
+          <FilterPill active={!onlySpecial} icon="star" label="All" onClick={() => setOnlySpecial(false)} />
+          <FilterPill active={onlySpecial} icon="fire" label={`On special${specials.length ? ` · ${specials.length}` : ''}`} onClick={() => setOnlySpecial(true)} />
           {items.length ? (
-            <button type="button" className="text-sm font-extrabold text-muted" onClick={() => setConfirm(true)}>
+            <button type="button" className="ml-auto shrink-0 text-sm font-semibold text-muted" onClick={() => setConfirm(true)}>
               Clear all
             </button>
           ) : null}
@@ -51,24 +46,19 @@ export function ResearchedPage() {
 
         {specials.length && !onlySpecial ? (
           <section>
-            <h2 className="sticker mb-3 bg-lime px-3 py-1 text-lg font-black tracking-tight text-pine">On sale now</h2>
+            <h2 className="font-display mb-4 text-2xl font-bold">On sale now</h2>
             <div className="flex gap-3 overflow-x-auto pb-2">
               {specials.map((item) => {
                 const quote = bestSpecial(prices[item.code]?.stores || [])
                 return (
-                  <Link key={item.code} to={`/product/${encodeURIComponent(item.code)}`} className="w-44 shrink-0 overflow-hidden rounded-[24px] bg-white shadow-[0_10px_28px_rgba(20,48,40,0.06)]">
-                    <div className="flex h-28 items-center justify-center bg-[#fff6df]">
-                      {item.image ? <img src={item.image} alt="" className="h-full w-full object-contain p-2" referrerPolicy="no-referrer" /> : null}
+                  <Link key={item.code} to={`/product/${encodeURIComponent(item.code)}`} className="w-44 shrink-0 overflow-hidden rounded-3xl bg-white shadow-soft">
+                    <div className="blob-mask mx-3 mt-3 h-28 bg-gold-soft">
+                      {item.image ? <img src={item.image} alt="" className="h-full w-full object-contain" referrerPolicy="no-referrer" /> : <span className="grid h-full place-items-center text-pine"><Icon name="basket" /></span>}
                     </div>
                     <div className="p-3">
-                      <p className="line-clamp-2 font-extrabold leading-tight">{item.name || item.code}</p>
-                      {quote ? (
-                        <p className="mt-2 text-sm font-extrabold text-sale">
-                          {STORE_LABELS[quote.store]} {quote.price != null ? aud(quote.price) : ''}
-                          {quote.wasPrice ? <span className="ml-1 text-muted line-through">{aud(quote.wasPrice)}</span> : null}
-                        </p>
-                      ) : null}
-                      <span className="mt-2 inline-flex rounded-full bg-sale px-2 py-0.5 text-[11px] font-extrabold text-white">{quote ? quoteBadge(quote) : 'Special'}</span>
+                      <span className="tag-strip bg-pop text-white">{quote?.wasPrice ? 'Price drop' : 'On special'}</span>
+                      <p className="font-display mt-2 line-clamp-2 font-bold leading-tight">{item.name || item.code}</p>
+                      {quote?.price != null ? <p className="font-display mt-2 text-lg font-extrabold">{aud(quote.price)}</p> : null}
                     </div>
                   </Link>
                 )
@@ -86,18 +76,21 @@ export function ResearchedPage() {
         ) : (
           <ul className="space-y-3">
             {visible.map((item) => (
-              <li key={item.code} className="rounded-[28px] bg-white p-3 shadow-[0_10px_28px_rgba(20,48,40,0.06)]">
-                <Link to={`/product/${encodeURIComponent(item.code)}`} className="flex gap-3">
-                  <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#fff6df]">
-                    {item.image ? <img src={item.image} alt="" className="h-full w-full object-contain" referrerPolicy="no-referrer" /> : <span className="text-xs font-extrabold text-gold-ink">No photo</span>}
+              <li key={item.code} className="overflow-hidden rounded-3xl bg-white shadow-soft">
+                <Link to={`/product/${encodeURIComponent(item.code)}`} className="grid grid-cols-[104px_1fr] gap-3 p-3">
+                  <div className="blob-mask h-24 bg-gold-soft">
+                    {item.image ? <img src={item.image} alt="" className="h-full w-full object-contain" referrerPolicy="no-referrer" /> : <span className="grid h-full place-items-center text-pine"><Icon name="basket" /></span>}
                   </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-lg font-extrabold leading-tight">{item.name || 'Unknown product'}</p>
-                    <p className="truncate text-sm font-bold text-muted">{item.brand || item.code}</p>
-                    <p className="text-xs font-bold text-gold-ink">{scannedOn(item.scannedAt)}</p>
+                  <div className="min-w-0 py-1">
+                    <div className="flex flex-wrap gap-1">
+                      {bestSpecial(prices[item.code]?.stores || []) ? <span className="tag-strip bg-pop text-white">On special</span> : <span className="tag-strip bg-gold text-pine">Researched</span>}
+                      {Date.now() - item.scannedAt < 86_400_000 ? <span className="tag-strip bg-lime text-pine">New</span> : null}
+                    </div>
+                    <p className="font-display mt-2 truncate text-lg font-bold leading-tight">{item.name || 'Unknown product'}</p>
+                    <p className="truncate text-sm text-muted">{item.brand || item.code} · {scannedOn(item.scannedAt)}</p>
                   </div>
                 </Link>
-                <div className="mt-3">
+                <div className="px-3 pb-3">
                   <PriceStack record={prices[item.code]} pending={pending.includes(item.code)} compact />
                 </div>
                 <div className="mt-3 flex gap-2">
@@ -133,5 +126,14 @@ export function ResearchedPage() {
         </div>
       </Sheet>
     </div>
+  )
+}
+
+function FilterPill({ active, icon, label, onClick }: { active: boolean; icon: 'star' | 'fire'; label: string; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick} className={`press flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold ${active ? 'bg-pine text-gold' : 'bg-white text-pine shadow-soft'}`}>
+      <Icon name={icon} size={16} />
+      {label}
+    </button>
   )
 }

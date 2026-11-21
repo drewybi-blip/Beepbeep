@@ -10,6 +10,7 @@ import { Input } from '../components/ui/input.tsx'
 import { aud } from '../lib/format.ts'
 import { lowestPrice, usePrices } from '../lib/prices.ts'
 import { addFreeText, clearTicked, removeItem, setQuantity, toggleItem, useShoppingList } from '../lib/shopping.ts'
+import { Confetti } from '../components/Confetti.tsx'
 
 export function ShoppingPage() {
   const items = useShoppingList()
@@ -62,36 +63,43 @@ export function ShoppingPage() {
             {items.map((item) => {
               const price = item.barcode ? lowestPrice(prices[item.barcode]) : null
               return (
-                <li key={item.id} className={`rounded-[24px] bg-white p-3 shadow-sm ${item.checked ? 'opacity-60' : ''}`}>
-                  <div className="flex items-center gap-3">
+                <li key={item.id} className={`overflow-hidden rounded-3xl bg-white shadow-soft transition ${item.checked ? 'opacity-60' : ''}`}>
+                  {item.store ? <div className="tag-strip rounded-none bg-gold text-pine">{item.store}</div> : null}
+                  <div className="flex items-start gap-3 p-4">
                     <button
                       type="button"
                       aria-pressed={item.checked}
                       aria-label={item.checked ? `Untick ${item.name}` : `Tick ${item.name}`}
                       onClick={() => toggleItem(item.id)}
-                      className={`h-8 w-8 shrink-0 rounded-full border-2 ${item.checked ? 'border-pine bg-gold' : 'border-line bg-white'}`}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className={`truncate font-extrabold ${item.checked ? 'line-through' : ''}`}>{item.name}</p>
-                      <p className="text-xs font-bold text-muted">
-                        {item.brand || 'Typed in'}
-                        {price != null ? ` · from ${aud(price)} online` : ''}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button type="button" className="flex h-9 w-9 items-center justify-center rounded-full bg-paper text-lg font-bold" onClick={() => setQuantity(item.id, item.quantity - 1)} aria-label="Decrease quantity">−</button>
-                      <span className="w-6 text-center font-bold">{item.quantity}</span>
-                      <button type="button" className="flex h-9 w-9 items-center justify-center rounded-full bg-paper text-lg font-bold" onClick={() => setQuantity(item.id, item.quantity + 1)} aria-label="Increase quantity">+</button>
-                    </div>
-                    <button type="button" className="text-sm font-semibold text-muted" onClick={() => removeItem(item.id)} aria-label={`Remove ${item.name}`}>
-                      Remove
+                      className={`press grid h-14 w-14 shrink-0 place-items-center rounded-full border-4 ${item.checked ? 'border-pine bg-gold text-pine' : 'border-line bg-paper text-transparent'}`}
+                    >
+                      <Icon name="tick" size={28} />
                     </button>
+                    <div className="min-w-0 flex-1">
+                      <p className={`font-display text-lg leading-tight font-bold ${item.checked ? 'line-through' : ''}`}>{item.name}</p>
+                      <p className="text-xs font-semibold text-muted">
+                        {item.brand || 'Typed in'}
+                        {price != null ? ` · from ${aud(price)}` : ''}
+                      </p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <button type="button" className="flex h-8 w-8 items-center justify-center rounded-full bg-paper text-lg font-bold" onClick={() => setQuantity(item.id, item.quantity - 1)} aria-label="Decrease quantity">−</button>
+                        <span className="w-6 text-center text-sm font-bold">{item.quantity}</span>
+                        <button type="button" className="flex h-8 w-8 items-center justify-center rounded-full bg-paper text-lg font-bold" onClick={() => setQuantity(item.id, item.quantity + 1)} aria-label="Increase quantity">+</button>
+                        <button type="button" className="ml-auto text-sm font-semibold text-muted" onClick={() => removeItem(item.id)} aria-label={`Remove ${item.name}`}>Remove</button>
+                      </div>
+                    </div>
                   </div>
                 </li>
               )
             })}
           </ul>
         )}
+        {items.length > 0 && open.length === 0 ? (
+          <div className="relative overflow-hidden rounded-3xl bg-lime px-4 py-6 text-center">
+            <Confetti />
+            <p className="font-display relative text-2xl font-bold text-pine">List done. Nice trolley.</p>
+          </div>
+        ) : null}
         {items.some((item) => item.checked) ? (
           <Button type="button" variant="secondary" onClick={clearTicked}>Clear ticked</Button>
         ) : null}

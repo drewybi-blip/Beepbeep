@@ -53,7 +53,7 @@ export function ProductView({ product, prices, pending }: { product: Product; pr
             {special ? <span className="tag-strip bg-pop text-white">{special.wasPrice ? 'Price drop' : 'On special'}</span> : null}
             {place.store ? <span className="tag-strip bg-gold text-pine">Cheapest at {place.store}</span> : null}
           </div>
-          <div className="blob-mask mx-auto aspect-square max-h-72 bg-white">
+          <div className="blob-mask mx-auto h-64 w-full max-w-[280px] bg-white">
             {product.image ? (
               <img src={product.image.value} alt={product.name?.value || 'Product photo'} className="h-full w-full object-contain p-6" referrerPolicy="no-referrer" />
             ) : (

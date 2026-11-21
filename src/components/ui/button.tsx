@@ -12,6 +12,7 @@ const buttonVariants = cva(
         secondary: 'bg-white text-pine shadow-[0_8px_24px_rgba(20,48,40,0.06)] ring-1 ring-line hover:bg-gold-soft',
         ghost: 'bg-transparent text-pine hover:bg-white/70',
         sale: 'bg-sale text-white hover:opacity-90',
+        pine: 'bg-pine text-gold shadow-soft hover:bg-leaf',
       },
       size: {
         default: 'h-12 px-5 text-base',
