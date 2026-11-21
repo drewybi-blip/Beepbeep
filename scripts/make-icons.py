@@ -1,35 +1,29 @@
-"""Draw the ShopMate home-screen icons."""
+"""Draw the BeepBeep home-screen icons: a gold tile with a barcode beep."""
 
 from pathlib import Path
 
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1] / "public"
+GOLD = "#FFC20E"
+PINE = "#0E3B2E"
+CREAM = "#FFF8EE"
 
 
 def draw(size: int, maskable: bool = False) -> Image.Image:
-    image = Image.new("RGB", (size, size), "#FFF8EE" if maskable else "#FFC20E")
+    image = Image.new("RGB", (size, size), CREAM if maskable else GOLD)
     draw = ImageDraw.Draw(image)
     if maskable:
-        inset = int(size * 0.12)
-        draw.rounded_rectangle((inset, inset, size - inset, size - inset), radius=int(size * 0.18), fill="#FFC20E")
-    bag_top = size * 0.42
-    bag_left = size * 0.30
-    bag_right = size * 0.70
-    bag_bottom = size * 0.74
-    draw.polygon(
-        [(bag_left, bag_top), (bag_right, bag_top), (bag_right - size * 0.04, bag_bottom), (bag_left + size * 0.04, bag_bottom)],
-        fill="#0E3B2E",
-    )
-    handle = [
-        (size * 0.40, bag_top),
-        (size * 0.40, size * 0.30),
-        (size * 0.60, size * 0.30),
-        (size * 0.60, bag_top),
-    ]
-    draw.arc((handle[0][0], size * 0.26, handle[2][0], bag_top + size * 0.02), 180, 360, fill="#0E3B2E", width=max(3, size // 18))
-    dot = size * 0.045
-    draw.ellipse((size / 2 - dot, size * 0.55, size / 2 + dot, size * 0.55 + dot * 2), fill="#FFC20E")
+        inset = int(size * 0.14)
+        draw.rounded_rectangle((inset, inset, size - inset, size - inset), radius=int(size * 0.18), fill=GOLD)
+    scale = size / 64
+    def r(value: float) -> int:
+        return int(value * scale)
+
+    draw.rounded_rectangle((r(12), r(26), r(18), r(42)), radius=r(2), fill=PINE)
+    draw.rounded_rectangle((r(22), r(16), r(28), r(48)), radius=r(2), fill=PINE)
+    draw.arc((r(32), r(20), r(48), r(44)), 280, 80, fill=PINE, width=max(3, size // 18))
+    draw.arc((r(36), r(12), r(58), r(52)), 280, 80, fill=PINE, width=max(3, size // 18))
     return image
 
 

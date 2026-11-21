@@ -3,10 +3,10 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
-const dataDir = process.env.SHOPMATE_DATA_DIR || path.join(root, 'data')
+const dataDir = process.env.BEEPBEEP_DATA_DIR || process.env.SHOPMATE_DATA_DIR || path.join(root, 'data')
 const filePath = path.join(dataDir, 'cache.json')
 
-const EMPTY = { devices: {}, prices: {}, upc: {} }
+const EMPTY = { devices: {}, prices: {}, upc: {}, lists: {} }
 
 let state = structuredClone(EMPTY)
 let loaded = false
@@ -72,6 +72,16 @@ export function getUpc(code) {
 
 export function saveUpc(code, payload) {
   state.upc[code] = { savedAt: new Date().toISOString(), payload }
+  void persist()
+}
+
+export function getList(id) {
+  return state.lists?.[id] || null
+}
+
+export function saveList(list) {
+  if (!state.lists) state.lists = {}
+  state.lists[list.id] = list
   void persist()
 }
 

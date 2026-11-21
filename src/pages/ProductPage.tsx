@@ -5,7 +5,7 @@ import { ProductView } from '../components/ProductView.tsx'
 import { TopBar } from '../components/TopBar.tsx'
 import { Button } from '../components/ui/button.tsx'
 import { lookupProduct } from '../lib/lookup.ts'
-import { usePrices } from '../lib/prices.ts'
+import { preferredPlace, usePrices } from '../lib/prices.ts'
 import { rememberProduct } from '../lib/researched.ts'
 import { addProductToList, useShoppingList } from '../lib/shopping.ts'
 import type { ProductView as Product } from '../lib/types.ts'
@@ -18,9 +18,10 @@ export function ProductPage() {
   const { prices, pending } = usePrices()
   const list = useShoppingList()
   const onList = list.some((item) => item.barcode === code)
+  const [wiggle, setWiggle] = useState(false)
 
   useEffect(() => {
-    document.title = 'ShopMate'
+    document.title = 'BeepBeep'
     let cancelled = false
     setProduct(null)
     setError(null)
@@ -29,7 +30,7 @@ export function ProductPage() {
         if (cancelled) return
         setProduct(found)
         rememberProduct(found)
-        document.title = found.name ? `${found.name.value} · ShopMate` : 'ShopMate'
+        document.title = found.name ? `${found.name.value} · BeepBeep` : 'BeepBeep'
       })
       .catch(() => {
         if (!cancelled) setError('The catalogues didn’t answer. Check your connection and try again.')
@@ -41,12 +42,12 @@ export function ProductPage() {
 
   return (
     <div>
-      <TopBar back title="ShopMate" />
+      <TopBar back title="BeepBeep" />
       {!product && !error ? (
         <div className="space-y-4 px-4">
           <div className="h-72 animate-pulse rounded-[32px] bg-white" />
           <div className="h-28 animate-pulse rounded-[28px] bg-white" />
-          <p className="font-extrabold text-gold-ink">Checking the open catalogues…</p>
+          <p className="font-black text-gold-ink">Rummaging through the open catalogues…</p>
         </div>
       ) : null}
       {error ? <p className="mx-4 rounded-[24px] bg-white p-5 font-bold text-sale">{error}</p> : null}
@@ -56,11 +57,15 @@ export function ProductPage() {
           <Button
             type="button"
             size="lg"
-            className="w-full"
-            onClick={() => addProductToList(product)}
+            className={`w-full ${wiggle ? 'wiggle' : ''}`}
+            onClick={() => {
+              addProductToList(product, preferredPlace(prices[product.code]))
+              setWiggle(true)
+              window.setTimeout(() => setWiggle(false), 500)
+            }}
           >
             <ShoppingBag />
-            {onList ? 'Add another' : 'Add to shopping list'}
+            {onList ? 'One more in the trolley' : 'Pop it on the list'}
           </Button>
         </div>
       ) : null}

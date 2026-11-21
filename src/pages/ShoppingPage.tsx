@@ -1,6 +1,9 @@
 import { Minus, Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { InstallHint } from '../components/InstallHint.tsx'
 import { SpecialBanner } from '../components/SpecialBanner.tsx'
+import { WalletButtons } from '../components/WalletButtons.tsx'
 import { TopBar } from '../components/TopBar.tsx'
 import { Button } from '../components/ui/button.tsx'
 import { Input } from '../components/ui/input.tsx'
@@ -27,7 +30,12 @@ export function ShoppingPage() {
     <div>
       <TopBar title="Shopping list" />
       <main className="space-y-4 px-4 pb-28">
-        <p className="font-semibold text-muted">Tick items off as you shop. This list stays on your phone.</p>
+        <p className="font-semibold text-muted">Tick them off as you wander the aisles. This list stays on your phone, even with no reception.</p>
+        <Link to="/store" className="flex h-14 items-center justify-center rounded-full bg-lime text-lg font-black text-pine shadow-[4px_4px_0_#0e3b2e]">
+          In-store mode
+        </Link>
+        <InstallHint />
+        <WalletButtons />
         <SpecialBanner records={Object.values(prices)} barcodes={new Set(items.map((item) => item.barcode).filter((code): code is string => Boolean(code)))} />
         <form
           className="flex gap-2"
@@ -45,7 +53,7 @@ export function ShoppingPage() {
 
         {!items.length ? (
           <div className="rounded-[28px] bg-white p-6 text-center">
-            <p className="text-xl font-extrabold">Your list is empty</p>
+            <p className="text-xl font-black">The trolley’s empty</p>
             <p className="mt-2 font-semibold text-muted">Add something from a product, or type it in.</p>
           </div>
         ) : (

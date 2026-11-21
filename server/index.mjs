@@ -4,7 +4,8 @@ import http from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { enqueue, isPending, pendingList, startScheduler } from './jobs.mjs'
-import { getDevice, getPrice, getUpc, isFresh, ready, saveDevice, saveUpc } from './store.mjs'
+import { getDevice, getList, getPrice, getUpc, isFresh, ready, saveDevice, saveList, saveUpc } from './store.mjs'
+import { buildApplePass, googleSaveUrl, walletStatus } from './wallet.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const dist = path.join(root, 'dist')
@@ -62,6 +63,14 @@ function readBody(req) {
   })
 }
 
+function publicOrigin(req) {
+  const configured = process.env.PUBLIC_BASE_URL || process.env.BEEPBEEP_PUBLIC_URL
+  if (configured) return String(configured).replace(/\/$/, '')
+  const proto = req.headers['x-forwarded-proto'] || 'https'
+  const hostHeader = req.headers['x-forwarded-host'] || req.headers.host || 'localhost'
+  return `${proto}://${hostHeader}`
+}
+
 function cleanProduct(input) {
   const barcode = String(input?.barcode || '').trim().slice(0, 80)
   if (!barcode) return null
@@ -110,7 +119,8 @@ async function serveStatic(res, url) {
     const info = await stat(filePath)
     if (!info.isFile()) throw new Error('not a file')
     const type = TYPES[path.extname(filePath)] || 'application/octet-stream'
-    res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'public, max-age=300' })
+    const cache = path.extname(filePath) === '.html' ? 'no-cache' : 'public, max-age=300'
+    res.writeHead(200, { 'Content-Type': type, 'Cache-Control': cache })
     createReadStream(filePath).pipe(res)
   } catch {
     const fallback = path.join(dist, 'index.html')
@@ -130,7 +140,7 @@ const server = http.createServer(async (req, res) => {
   }
   try {
     if (url.pathname === '/api/health') {
-      send(res, 200, { ok: true, name: 'ShopMate', pending: pendingList().length })
+      send(res, 200, { ok: true, name: 'BeepBeep', pending: pendingList().length })
       return
     }
     if (url.pathname === '/api/upc' && req.method === 'GET') {
@@ -167,6 +177,81 @@ const server = http.createServer(async (req, res) => {
       send(res, 200, { prices: pricesFor(products), pending })
       return
     }
+    if (url.pathname === '/api/wallet/status' && req.method === 'GET') {
+      send(res, 200, walletStatus())
+      return
+    }
+    if (url.pathname === '/api/lists' && req.method === 'POST') {
+      const body = await readBody(req)
+      if (!UUID.test(body.id || '')) {
+        send(res, 400, { error: 'List id must be a UUID.' })
+        return
+      }
+      const items = (Array.isArray(body.items) ? body.items : []).slice(0, 80).map((item) => ({
+        id: String(item.id || '').slice(0, 80),
+        name: String(item.name || '').slice(0, 160),
+        quantity: Math.min(99, Math.max(1, Number(item.quantity) || 1)),
+        checked: Boolean(item.checked),
+        barcode: item.barcode ? String(item.barcode).slice(0, 80) : null,
+        brand: item.brand ? String(item.brand).slice(0, 120) : null,
+        store: item.store ? String(item.store).slice(0, 40) : null,
+        aisle: item.aisle ? String(item.aisle).slice(0, 40) : null,
+      })).filter((item) => item.id && item.name)
+      const list = {
+        id: body.id,
+        updatedAt: new Date().toISOString(),
+        currency: 'AUD',
+        estimate: typeof body.estimate === 'number' ? body.estimate : null,
+        items,
+      }
+      saveList(list)
+      send(res, 200, list)
+      return
+    }
+    const listMatch = url.pathname.match(/^\/api\/lists\/([0-9a-f-]{36})$/i)
+    if (listMatch && req.method === 'GET') {
+      const list = getList(listMatch[1])
+      if (!list) {
+        send(res, 404, { error: 'List not found' })
+        return
+      }
+      send(res, 200, list)
+      return
+    }
+    const appleMatch = url.pathname.match(/^\/api\/wallet\/apple\/([0-9a-f-]{36})$/i)
+    if (appleMatch && req.method === 'GET') {
+      if (!walletStatus().apple) {
+        send(res, 503, { comingSoon: true, error: 'Apple Wallet is not configured.' })
+        return
+      }
+      const list = getList(appleMatch[1])
+      if (!list) {
+        send(res, 404, { error: 'List not found' })
+        return
+      }
+      const pass = await buildApplePass(list, publicOrigin(req))
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.apple.pkpass',
+        'Content-Disposition': 'attachment; filename="beepbeep.pkpass"',
+        'Cache-Control': 'no-store',
+      })
+      res.end(pass)
+      return
+    }
+    const googleMatch = url.pathname.match(/^\/api\/wallet\/google\/([0-9a-f-]{36})$/i)
+    if (googleMatch && req.method === 'GET') {
+      if (!walletStatus().google) {
+        send(res, 503, { comingSoon: true, error: 'Google Wallet is not configured.' })
+        return
+      }
+      const list = getList(googleMatch[1])
+      if (!list) {
+        send(res, 404, { error: 'List not found' })
+        return
+      }
+      send(res, 200, { url: googleSaveUrl(list, publicOrigin(req)) })
+      return
+    }
     if (url.pathname.startsWith('/api/')) {
       send(res, 404, { error: 'Not found' })
       return
@@ -178,10 +263,10 @@ const server = http.createServer(async (req, res) => {
     send(res, 404, { error: 'API only. Open the Vite dev server.' })
   } catch (error) {
     console.error(error instanceof Error ? error.message : error)
-    send(res, 500, { error: 'ShopMate could not finish that request.' })
+    send(res, 500, { error: 'BeepBeep could not finish that request.' })
   }
 })
 
 server.listen(port, host, () => {
-  console.log(`ShopMate API on http://${host}:${port}`)
+  console.log(`BeepBeep API on http://${host}:${port}`)
 })

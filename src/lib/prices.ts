@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { STORE_LABELS } from './format.ts'
 import type { PriceRecord, ResearchedItem } from './types.ts'
 import { loadResearched, useResearched } from './researched.ts'
 
@@ -118,4 +119,11 @@ export function markSpecialsSeen(keys: string[]) {
 export function lowestPrice(record: PriceRecord | undefined) {
   const prices = (record?.stores || []).map((store) => store.price).filter((price): price is number => price != null)
   return prices.length ? Math.min(...prices) : null
+}
+
+export function preferredPlace(record: PriceRecord | undefined) {
+  const found = (record?.stores || []).filter((store) => store.status === 'found' && store.price != null)
+  if (!found.length) return { store: null, aisle: null }
+  found.sort((a, b) => (a.price as number) - (b.price as number))
+  return { store: STORE_LABELS[found[0].store] || found[0].store, aisle: null }
 }

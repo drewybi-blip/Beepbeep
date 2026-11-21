@@ -1,11 +1,13 @@
 import { Camera, ImagePlus, Keyboard, ScanLine } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { InstallHint } from '../components/InstallHint.tsx'
 import { TopBar } from '../components/TopBar.tsx'
 import { Button } from '../components/ui/button.tsx'
 import { Input } from '../components/ui/input.tsx'
 import { Sheet } from '../components/ui/dialog.tsx'
 import { cameraMessage, decodeImageFile, startLiveScan } from '../lib/scan.ts'
+import { playScanBeep, unlockAudio } from '../lib/sound.ts'
 
 export function ScanPage() {
   const navigate = useNavigate()
@@ -18,26 +20,35 @@ export function ScanPage() {
   const [typed, setTyped] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [pop, setPop] = useState(false)
 
   useEffect(() => {
-    document.title = 'ShopMate'
+    document.title = 'BeepBeep'
     return () => stopRef.current?.()
   }, [])
 
-  function openCode(code: string) {
+  function openCode(code: string, scanned = false) {
     const trimmed = code.trim()
     if (!trimmed) return
-    navigate(`/product/${encodeURIComponent(trimmed)}`)
+    const go = () => navigate(`/product/${encodeURIComponent(trimmed)}`)
+    if (!scanned) {
+      go()
+      return
+    }
+    playScanBeep()
+    setPop(true)
+    window.setTimeout(go, 420)
   }
 
   async function beginCamera() {
+    unlockAudio()
     setError(null)
     setLive(true)
     await new Promise((resolve) => window.setTimeout(resolve, 40))
     const video = videoRef.current
     if (!video) return
     try {
-      const session = await startLiveScan(video, (decoded) => openCode(decoded.text))
+      const session = await startLiveScan(video, (decoded) => openCode(decoded.text, true))
       stopRef.current = session.stop
     } catch (caught) {
       setLive(false)
@@ -52,12 +63,13 @@ export function ScanPage() {
   }
 
   async function onFile(file: File | undefined) {
+    unlockAudio()
     if (!file) return
     setBusy(true)
     setError(null)
     try {
       const decoded = await decodeImageFile(file)
-      openCode(decoded.text)
+      openCode(decoded.text, true)
     } catch {
       setError('No barcode in that photo. Try a closer, well-lit shot, or type the code.')
     } finally {
@@ -66,13 +78,14 @@ export function ScanPage() {
   }
 
   async function decodeSample() {
+    unlockAudio()
     setBusy(true)
     setError(null)
     try {
       const response = await fetch('/samples/nutella-ean13.png')
       const blob = await response.blob()
       const decoded = await decodeImageFile(blob)
-      openCode(decoded.text)
+      openCode(decoded.text, true)
     } catch {
       setError('The sample photo could not be decoded.')
     } finally {
@@ -100,14 +113,17 @@ export function ScanPage() {
           </section>
         ) : (
           <section className="pt-2">
-            <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-gold-ink">Ready when you are</p>
-            <h2 className="mt-2 max-w-[11ch] text-[3.1rem] font-extrabold leading-[0.9] tracking-tight text-pine">
+            <p className="sticker bg-lime px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-pine">Ready when you are</p>
+            <h2 className="mt-3 max-w-[11ch] text-[3.25rem] font-black leading-[0.86] tracking-tight text-pine">
               Scan a barcode.
             </h2>
             <p className="mt-4 max-w-[34ch] text-base font-semibold leading-relaxed text-muted">
-              Point your camera at a product. ShopMate reads the code and pulls the open data behind it. Australian foods are well covered by Open Food Facts.
+              Point, beep, know. BeepBeep reads the code and pulls the open data behind it. Australian foods are well covered by Open Food Facts.
             </p>
-            <Button type="button" size="lg" className="mt-6 w-full" onClick={() => void beginCamera()}>
+            <div className="mt-5">
+              <InstallHint />
+            </div>
+            <Button type="button" size="lg" className="mt-4 w-full" onClick={() => void beginCamera()}>
               <ScanLine />
               Start camera
             </Button>
@@ -128,8 +144,13 @@ export function ScanPage() {
           </section>
         )}
 
-        {busy ? <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm font-extrabold text-pine">Reading the barcode…</p> : null}
+        {busy ? <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm font-black text-pine">Squinting at the bars…</p> : null}
         {error ? <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm font-bold text-sale">{error}</p> : null}
+        {pop ? (
+          <p className="pop-in sticker mt-4 bg-lime px-4 py-3 text-lg font-black text-pine" role="status">
+            Beep. Got it.
+          </p>
+        ) : null}
 
         <button type="button" onClick={() => void decodeSample()} className="mt-8 text-left text-sm font-bold text-gold-ink underline">
           No packet handy? Decode the Nutella sample photo.

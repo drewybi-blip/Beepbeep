@@ -45,7 +45,7 @@ function PriceLine({ quote, compact }: { quote: StoreQuote; compact: boolean }) 
         )}
       </div>
       {badge ? (
-        <span className="mt-1 inline-flex rounded-full bg-sale px-2 py-0.5 text-[11px] font-extrabold text-white">{badge}</span>
+        <span className="sticker mt-1 bg-pop px-2 py-0.5 text-[11px] font-black text-white">{badge}</span>
       ) : null}
       {quote.unitPrice && !compact ? <p className="mt-1 text-xs font-semibold text-muted">{quote.unitPrice}</p> : null}
       {compact && quote.match ? (

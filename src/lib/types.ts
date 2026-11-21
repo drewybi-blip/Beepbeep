@@ -100,4 +100,6 @@ export type ListItem = {
   quantity: number
   checked: boolean
   addedAt: number
+  store: string | null
+  aisle: string | null
 }

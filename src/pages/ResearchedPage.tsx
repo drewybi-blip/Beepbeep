@@ -9,6 +9,7 @@ import { Sheet } from '../components/ui/dialog.tsx'
 import { aud, scannedOn, STORE_LABELS } from '../lib/format.ts'
 import { usePrices } from '../lib/prices.ts'
 import { clearResearched, removeResearched, useResearched } from '../lib/researched.ts'
+import { preferredPlace } from '../lib/prices.ts'
 import { addProductToList } from '../lib/shopping.ts'
 import type { StoreQuote } from '../lib/types.ts'
 
@@ -30,7 +31,7 @@ export function ResearchedPage() {
     <div>
       <TopBar title="Researched" />
       <main className="space-y-4 px-4 pb-8">
-        <p className="font-semibold text-muted">Everything you’ve scanned, saved on this phone.</p>
+        <p className="font-semibold text-muted">Your little pantry of discoveries, saved on this phone.</p>
         <SpecialBanner records={records} />
         {offline ? <p className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-sale">Price check is offline. Your researched products are still here.</p> : null}
         <div className="flex items-center justify-between gap-3">
@@ -50,7 +51,7 @@ export function ResearchedPage() {
 
         {specials.length && !onlySpecial ? (
           <section>
-            <h2 className="mb-3 text-xl font-extrabold tracking-tight">On sale now</h2>
+            <h2 className="sticker mb-3 bg-lime px-3 py-1 text-lg font-black tracking-tight text-pine">On sale now</h2>
             <div className="flex gap-3 overflow-x-auto pb-2">
               {specials.map((item) => {
                 const quote = bestSpecial(prices[item.code]?.stores || [])
@@ -78,7 +79,7 @@ export function ResearchedPage() {
 
         {!visible.length ? (
           <div className="rounded-[28px] bg-white p-6 text-center shadow-sm">
-            <p className="text-xl font-extrabold">{onlySpecial ? 'Nothing on special right now' : 'Nothing researched yet'}</p>
+            <p className="text-xl font-black">{onlySpecial ? 'No bargains right now' : 'Nothing researched yet'}</p>
             <p className="mt-2 font-semibold text-muted">{onlySpecial ? 'We’ll flag it here when a checked price drops.' : 'Scan a barcode and it will land here.'}</p>
           </div>
         ) : (
@@ -99,7 +100,7 @@ export function ResearchedPage() {
                   <PriceStack record={prices[item.code]} pending={pending.includes(item.code)} compact />
                 </div>
                 <div className="mt-3 flex gap-2">
-                  <Button type="button" size="sm" variant="secondary" onClick={() => addProductToList(item)}>
+                  <Button type="button" size="sm" variant="secondary" onClick={() => addProductToList(item, preferredPlace(prices[item.code]))}>
                     <Plus size={16} /> Add
                   </Button>
                   <Button type="button" size="sm" variant="ghost" onClick={() => removeResearched(item.code)} aria-label={`Remove ${item.name || item.code}`}>

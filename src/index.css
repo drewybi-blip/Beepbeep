@@ -14,6 +14,10 @@
   --color-pine: #0e3b2e;
   --color-leaf: #1f7a4d;
   --color-sale: #d92d20;
+  --color-lime: #c6f54a;
+  --color-mint: #7de2c4;
+  --color-pop: #ff7a3c;
+  --color-pink: #ff5d8f;
 }
 
 html,
@@ -25,6 +29,8 @@ body,
 body {
   margin: 0;
   background:
+    radial-gradient(420px 220px at 8% -40px, #c6f54a 0%, transparent 70%),
+    radial-gradient(380px 240px at 110% 0, #ff7a3c 0%, transparent 62%),
     radial-gradient(1200px 480px at 50% -80px, #ffe8a3 0%, transparent 60%),
     #fff4df;
   color: var(--color-ink);
@@ -48,4 +54,53 @@ input {
   0% { top: 12%; }
   50% { top: 78%; }
   100% { top: 12%; }
+}
+
+.sticker {
+  display: inline-flex;
+  transform: rotate(-3deg);
+  border-radius: 999px;
+  box-shadow: 3px 3px 0 #0e3b2e;
+}
+
+.blob {
+  border-radius: 46% 54% 48% 52% / 42% 46% 54% 58%;
+}
+
+.pop-in {
+  animation: pop-in 0.45s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+.wiggle {
+  animation: wiggle 0.45s ease-in-out;
+}
+
+.confetti-bit {
+  animation: confetti 1.3s ease-in forwards;
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.72) rotate(-6deg); }
+  70% { transform: scale(1.08) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0) scale(1); }
+  30% { transform: rotate(-5deg) scale(1.06); }
+  65% { transform: rotate(4deg) scale(1.04); }
+}
+
+@keyframes confetti {
+  0% { transform: translateY(-10px) rotate(0); opacity: 1; }
+  100% { transform: translateY(140px) rotate(80deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-line,
+  .pop-in,
+  .wiggle,
+  .confetti-bit {
+    animation: none;
+  }
 }

@@ -1,5 +1,6 @@
 import { ChevronLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { SoundToggle } from './SoundToggle.tsx'
 import { Wordmark } from './Wordmark.tsx'
 
 export function TopBar({ back = false, title }: { back?: boolean; title?: string }) {
@@ -16,7 +17,8 @@ export function TopBar({ back = false, title }: { back?: boolean; title?: string
           <ChevronLeft />
         </button>
       ) : null}
-      {title ? <h1 className="text-2xl font-extrabold tracking-tight">{title}</h1> : <Wordmark />}
+      {title ? <h1 className="text-2xl font-black tracking-tight">{title}</h1> : <Wordmark />}
+      <SoundToggle />
     </header>
   )
 }

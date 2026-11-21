@@ -12,8 +12,8 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'samples/nutella-ean13.png'],
       manifest: {
         id: '/',
-        name: 'ShopMate',
-        short_name: 'ShopMate',
+        name: 'BeepBeep',
+        short_name: 'BeepBeep',
         description: 'Scan a barcode, see the product, and keep a shopping list.',
         lang: 'en-AU',
         dir: 'ltr',
@@ -32,6 +32,15 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
         navigateFallback: 'index.html',
         runtimeCaching: [
+          {
+            urlPattern: ({ url, request }) => request.method === 'GET' && url.pathname.startsWith('/api/lists/'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'shopmate-lists',
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
           {
             urlPattern: /^https:\/\/images\.openfoodfacts\.org\/.*/i,
             handler: 'CacheFirst',
