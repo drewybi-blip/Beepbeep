@@ -154,7 +154,7 @@ export function ScanPage() {
             src="/food/campaign-480.webp"
             srcSet="/food/campaign-480.webp 480w, /food/campaign-960.webp 960w"
             sizes="100vw"
-            alt="Tomatoes, avocado, citrus, penne and a plain toothpaste tube"
+            alt="Scan it, save it, beep beep. Tomatoes, basil, avocado, citrus, mangoes, bread, loose penne and plain toilet paper."
             width={960}
             height={720}
             decoding="async"
@@ -162,18 +162,14 @@ export function ScanPage() {
             className="block aspect-[4/3] w-full object-cover"
           />
           <main className="space-y-8 px-4 pt-4 pb-28">
+            <h1 className="sr-only">Scan it, save it, beep beep</h1>
             <Button type="button" size="lg" className="press glow w-full" onClick={() => void beginCamera()}>
               <Icon name="scan" size={22} />
               Scan barcode
             </Button>
-            <div>
-              <h1 className="font-display text-[32px] leading-none font-extrabold tracking-tight text-pine">
-                Scan it. Save it. Beep beep!
-              </h1>
-              <p className="mt-3 max-w-[32ch] text-base text-pine/80">
-                Line up the barcode. We’ll beep, then show the product and today’s shelf price.
-              </p>
-            </div>
+            <p className="max-w-[32ch] text-base text-pine/80">
+              Line up the barcode. We’ll beep, then show the product and today’s shelf price.
+            </p>
             <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
               <PantryPill active={pantry === 'all'} label="All" icon="star" onClick={() => setPantry('all')} />
               {PANTRY.map((item) => (
