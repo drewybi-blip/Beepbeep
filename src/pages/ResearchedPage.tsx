@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from 'lucide-react'
+import { Icon } from '../components/icons.tsx'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PriceStack, quoteBadge } from '../components/Prices.tsx'
@@ -78,9 +78,10 @@ export function ResearchedPage() {
         ) : null}
 
         {!visible.length ? (
-          <div className="rounded-[28px] bg-white p-6 text-center shadow-sm">
-            <p className="text-xl font-black">{onlySpecial ? 'No bargains right now' : 'Nothing researched yet'}</p>
-            <p className="mt-2 font-semibold text-muted">{onlySpecial ? 'We’ll flag it here when a checked price drops.' : 'Scan a barcode and it will land here.'}</p>
+          <div className="rounded-3xl bg-white px-6 py-10 text-center shadow-soft">
+            <span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gold text-pine"><Icon name={onlySpecial ? 'fire' : 'basket'} size={32} /></span>
+            <p className="font-display mt-4 text-2xl font-bold">{onlySpecial ? 'No bargains right now' : 'The pantry is quiet'}</p>
+            <p className="mt-2 text-sm text-muted">{onlySpecial ? 'We’ll flag it here when a checked price drops.' : 'Scan a packet and it shows up here, loud and proud.'}</p>
           </div>
         ) : (
           <ul className="space-y-3">
@@ -100,11 +101,11 @@ export function ResearchedPage() {
                   <PriceStack record={prices[item.code]} pending={pending.includes(item.code)} compact />
                 </div>
                 <div className="mt-3 flex gap-2">
-                  <Button type="button" size="sm" variant="secondary" onClick={() => addProductToList(item, preferredPlace(prices[item.code]))}>
-                    <Plus size={16} /> Add
+                  <Button type="button" size="sm" className="press flex-1 bg-pine text-gold" onClick={() => addProductToList(item, preferredPlace(prices[item.code]))}>
+                    <Icon name="basket" size={16} /> Add to list
                   </Button>
                   <Button type="button" size="sm" variant="ghost" onClick={() => removeResearched(item.code)} aria-label={`Remove ${item.name || item.code}`}>
-                    <Trash2 size={16} /> Remove
+                    Remove
                   </Button>
                 </div>
               </li>

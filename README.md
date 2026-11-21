@@ -28,7 +28,7 @@ serves the built app and the API together on `0.0.0.0:$PORT` (43123 if `PORT` is
 
 ## What you can do
 
-- **Scan** with the live camera. A successful read plays a short checkout beep (and a brief vibration on Android). The speaker button turns the beep off and that choice stays on the phone. The first tap unlocks audio for iPhone Safari. Android Chrome uses the Barcode Detector when the browser has it. Every browser, including iPhone Safari, falls back to ZXing. Supported codes: EAN-13, EAN-8, UPC-A, UPC-E, Code 128 and QR.
+- **Scan** with the live camera. A successful read plays a double checkout beep, beep-beep (two short tones, and two quick vibrations on Android). The speaker button turns the beep off and that choice stays on the phone. The first tap unlocks audio for iPhone Safari. Android Chrome uses the Barcode Detector when the browser has it. Every browser, including iPhone Safari, falls back to ZXing. Supported codes: EAN-13, EAN-8, UPC-A, UPC-E, Code 128 and QR.
 - **Take a photo or upload one** if the camera is blocked. There is a Nutella sample photo on the scan screen.
 - **Type a code.** `3017620422003` is Nutella. `9300633603423` is an example of a code with no public record (its check digit does not match).
 - **Researched** keeps every scan on this device. Open it again, add it to the shopping list, remove one, or clear them all.

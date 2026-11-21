@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react'
+import { Icon } from './icons.tsx'
 import { PriceStack } from './Prices.tsx'
+import { aud, STORE_LABELS } from '../lib/format.ts'
+import { preferredPlace } from '../lib/prices.ts'
 import type { PriceRecord, ProductView as Product } from '../lib/types.ts'
 
 const NUTRI: Record<string, string> = { A: '#038141', B: '#85bb2f', C: '#c9a000', D: '#ee8100', E: '#e63e11' }
@@ -12,10 +15,10 @@ const NOVA: Record<number, string> = {
 
 function Section({ title, source, children }: { title: string; source?: string; children: ReactNode }) {
   return (
-    <section className="rounded-[28px] bg-white p-5 shadow-[0_10px_30px_rgba(20,48,40,0.06)]">
-      <div className="mb-3 flex items-end justify-between gap-3">
-        <h2 className="text-xl font-extrabold tracking-tight">{title}</h2>
-        {source ? <p className="text-right text-[11px] font-extrabold text-gold-ink">{source}</p> : null}
+    <section className="rounded-3xl bg-white p-6 shadow-soft">
+      <div className="mb-4 flex items-end justify-between gap-4">
+        <h2 className="font-display text-2xl font-bold tracking-tight">{title}</h2>
+        {source ? <p className="text-right text-xs font-semibold text-gold-ink">{source}</p> : null}
       </div>
       {children}
     </section>
@@ -38,25 +41,36 @@ export function ProductView({ product, prices, pending }: { product: Product; pr
   const webSearch = `https://www.google.com/search?q=${encodeURIComponent(product.code)}`
   const addLink = `https://world.openfoodfacts.org/cgi/product.pl?type=edit&code=${encodeURIComponent(product.code)}`
   const hasServe = product.nutriments?.value.some((row) => row.perServe)
+  const place = preferredPlace(prices)
+  const best = (prices?.stores || []).filter((store) => store.status === 'found' && store.price != null).sort((a, b) => (a.price as number) - (b.price as number))[0]
+  const special = (prices?.stores || []).find((store) => store.onSpecial && store.price != null)
 
   return (
     <div className="space-y-4 px-4 pb-28">
-      <article className="overflow-hidden rounded-[32px] bg-white shadow-[0_16px_40px_rgba(20,48,40,0.08)]">
-        <div className="aspect-square bg-[#fff6df]">
-          {product.image ? (
-            <img
-              src={product.image.value}
-              alt={product.name?.value || 'Product photo'}
-              className="h-full w-full object-contain p-6"
-              referrerPolicy="no-referrer"
-            />
-          ) : (
-            <p className="flex h-full items-center justify-center text-center text-lg font-extrabold text-gold-ink">No photo on file</p>
-          )}
+      <article className="overflow-hidden rounded-3xl bg-white shadow-soft">
+        <div className="relative bg-gold-soft px-6 pt-6">
+          <div className="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
+            {special ? <span className="tag-strip bg-pop text-white">{special.wasPrice ? 'Price drop' : 'On special'}</span> : null}
+            {place.store ? <span className="tag-strip bg-gold text-pine">Cheapest at {place.store}</span> : null}
+          </div>
+          <div className="blob-mask mx-auto aspect-square max-h-72 bg-white">
+            {product.image ? (
+              <img src={product.image.value} alt={product.name?.value || 'Product photo'} className="h-full w-full object-contain p-6" referrerPolicy="no-referrer" />
+            ) : (
+              <p className="grid h-full place-items-center text-pine"><Icon name="basket" size={48} /></p>
+            )}
+          </div>
         </div>
-        <div className="p-5">
-          {product.brand ? <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-gold-ink">{product.brand.value}</p> : null}
-          <h2 className="mt-1 text-[2.1rem] font-extrabold leading-[0.95] tracking-tight text-pine">
+        {best ? (
+          <div className="grid grid-cols-3 divide-x divide-line bg-paper text-center">
+            <div className="px-2 py-3"><p className="text-[11px] font-semibold text-muted">Price</p><p className="font-display text-lg font-bold">{aud(best.price as number)}</p></div>
+            <div className="px-2 py-3"><p className="text-[11px] font-semibold text-muted">Unit</p><p className="font-display text-sm font-bold">{best.unitPrice || '—'}</p></div>
+            <div className="px-2 py-3"><p className="text-[11px] font-semibold text-muted">Store</p><p className="font-display text-sm font-bold">{STORE_LABELS[best.store] || best.store}</p></div>
+          </div>
+        ) : null}
+        <div className="p-6">
+          {product.brand ? <p className="text-sm font-semibold uppercase tracking-[0.14em] text-gold-ink">{product.brand.value}</p> : null}
+          <h2 className="font-display mt-2 text-[32px] leading-none font-extrabold tracking-tight text-pine">
             {product.name?.value || 'No public record'}
           </h2>
           {product.genericName && product.genericName.value.toLowerCase() !== product.name?.value.toLowerCase() ? (

@@ -67,19 +67,27 @@ export function playScanBeep() {
   if (!ctx) return
   if (ctx.state === 'suspended') void ctx.resume()
   const now = ctx.currentTime
+  // 90 ms tone, 70 ms gap, 90 ms tone a little higher. Sine plus a short ramp so the attack is crisp and click-free.
+  tone(ctx, now, 2700)
+  tone(ctx, now + 0.16, 2920)
+}
+
+function tone(ctx: AudioContext, start: number, frequency: number) {
+  const duration = 0.09
   const oscillator = ctx.createOscillator()
   const gain = ctx.createGain()
-  oscillator.type = 'square'
-  oscillator.frequency.setValueAtTime(2800, now)
-  gain.gain.setValueAtTime(0.0001, now)
-  gain.gain.exponentialRampToValueAtTime(0.12, now + 0.012)
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09)
+  oscillator.type = 'sine'
+  oscillator.frequency.setValueAtTime(frequency, start)
+  gain.gain.setValueAtTime(0.0001, start)
+  gain.gain.exponentialRampToValueAtTime(0.2, start + 0.006)
+  gain.gain.setValueAtTime(0.2, start + duration - 0.016)
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + duration)
   oscillator.connect(gain)
   gain.connect(ctx.destination)
-  oscillator.start(now)
-  oscillator.stop(now + 0.1)
+  oscillator.start(start)
+  oscillator.stop(start + duration + 0.02)
 }
 
 function buzz() {
-  if (typeof navigator.vibrate === 'function') navigator.vibrate(45)
+  if (typeof navigator.vibrate === 'function') navigator.vibrate([80, 70, 80])
 }

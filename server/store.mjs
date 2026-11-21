@@ -75,6 +75,36 @@ export function saveUpc(code, payload) {
   void persist()
 }
 
+export function listSpecials() {
+  const meta = new Map()
+  for (const device of Object.values(state.devices || {})) {
+    for (const product of device.products || []) {
+      if (product?.barcode) meta.set(product.barcode, product)
+    }
+  }
+  const specials = []
+  for (const [barcode, record] of Object.entries(state.prices || {})) {
+    const quotes = (record.stores || []).filter((store) => store.onSpecial && store.price != null)
+    if (!quotes.length) continue
+    quotes.sort((a, b) => a.price - b.price)
+    const best = quotes[0]
+    const product = meta.get(barcode)
+    specials.push({
+      barcode,
+      name: product?.name || record.name || best.productName || barcode,
+      image: product?.image || null,
+      brand: product?.brand || best.brand || null,
+      price: best.price,
+      wasPrice: best.wasPrice ?? null,
+      unitPrice: best.unitPrice || null,
+      store: best.store,
+      specialLabel: best.specialLabel || 'On special',
+      savings: best.wasPrice && best.wasPrice > best.price ? Math.round((best.wasPrice - best.price) * 100) / 100 : null,
+    })
+  }
+  return specials.slice(0, 12)
+}
+
 export function getList(id) {
   return state.lists?.[id] || null
 }

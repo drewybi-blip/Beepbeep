@@ -1,4 +1,4 @@
-import { Minus, Plus, Trash2 } from 'lucide-react'
+import { Icon } from '../components/icons.tsx'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { InstallHint } from '../components/InstallHint.tsx'
@@ -31,8 +31,8 @@ export function ShoppingPage() {
       <TopBar title="Shopping list" />
       <main className="space-y-4 px-4 pb-28">
         <p className="font-semibold text-muted">Tick them off as you wander the aisles. This list stays on your phone, even with no reception.</p>
-        <Link to="/store" className="flex h-14 items-center justify-center rounded-full bg-lime text-lg font-black text-pine shadow-[4px_4px_0_#0e3b2e]">
-          In-store mode
+        <Link to="/store" className="press flex h-14 items-center justify-center gap-2 rounded-full bg-pine text-lg font-bold text-gold shadow-soft">
+          <Icon name="store" size={22} /> In-store mode
         </Link>
         <InstallHint />
         <WalletButtons />
@@ -46,15 +46,16 @@ export function ShoppingPage() {
           }}
         >
           <Input value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Add milk, bread, anything" aria-label="New item" />
-          <Button type="submit" className="shrink-0" aria-label="Add item">
-            <Plus />
+          <Button type="submit" className="press shrink-0" aria-label="Add item">
+            <Icon name="tick" size={20} />
           </Button>
         </form>
 
         {!items.length ? (
-          <div className="rounded-[28px] bg-white p-6 text-center">
-            <p className="text-xl font-black">The trolley’s empty</p>
-            <p className="mt-2 font-semibold text-muted">Add something from a product, or type it in.</p>
+          <div className="rounded-3xl bg-white px-6 py-10 text-center shadow-soft">
+            <span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gold text-pine"><Icon name="basket" size={32} /></span>
+            <p className="font-display mt-4 text-2xl font-bold">The trolley’s empty</p>
+            <p className="mt-2 text-sm text-muted">Add something from a product, or type it in.</p>
           </div>
         ) : (
           <ul className="space-y-3">
@@ -78,16 +79,12 @@ export function ShoppingPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button type="button" className="flex h-9 w-9 items-center justify-center rounded-full bg-paper" onClick={() => setQuantity(item.id, item.quantity - 1)} aria-label="Decrease quantity">
-                        <Minus size={16} />
-                      </button>
-                      <span className="w-6 text-center font-extrabold">{item.quantity}</span>
-                      <button type="button" className="flex h-9 w-9 items-center justify-center rounded-full bg-paper" onClick={() => setQuantity(item.id, item.quantity + 1)} aria-label="Increase quantity">
-                        <Plus size={16} />
-                      </button>
+                      <button type="button" className="flex h-9 w-9 items-center justify-center rounded-full bg-paper text-lg font-bold" onClick={() => setQuantity(item.id, item.quantity - 1)} aria-label="Decrease quantity">−</button>
+                      <span className="w-6 text-center font-bold">{item.quantity}</span>
+                      <button type="button" className="flex h-9 w-9 items-center justify-center rounded-full bg-paper text-lg font-bold" onClick={() => setQuantity(item.id, item.quantity + 1)} aria-label="Increase quantity">+</button>
                     </div>
-                    <button type="button" className="text-muted" onClick={() => removeItem(item.id)} aria-label={`Remove ${item.name}`}>
-                      <Trash2 size={18} />
+                    <button type="button" className="text-sm font-semibold text-muted" onClick={() => removeItem(item.id)} aria-label={`Remove ${item.name}`}>
+                      Remove
                     </button>
                   </div>
                 </li>

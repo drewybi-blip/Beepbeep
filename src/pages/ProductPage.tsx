@@ -65,7 +65,7 @@ export function ProductPage() {
             }}
           >
             <ShoppingBag />
-            {onList ? 'One more in the trolley' : 'Pop it on the list'}
+            {onList ? 'Add another' : 'Add to list'}
           </Button>
         </div>
       ) : null}

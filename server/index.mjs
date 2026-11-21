@@ -4,7 +4,7 @@ import http from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { enqueue, isPending, pendingList, startScheduler } from './jobs.mjs'
-import { getDevice, getList, getPrice, getUpc, isFresh, ready, saveDevice, saveList, saveUpc } from './store.mjs'
+import { getDevice, getList, getPrice, getUpc, isFresh, listSpecials, ready, saveDevice, saveList, saveUpc } from './store.mjs'
 import { buildApplePass, googleSaveUrl, walletStatus } from './wallet.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -79,6 +79,7 @@ function cleanProduct(input) {
     name: input?.name ? String(input.name).trim().slice(0, 160) : null,
     brand: input?.brand ? String(input.brand).trim().slice(0, 120) : null,
     quantity: input?.quantity ? String(input.quantity).trim().slice(0, 80) : null,
+    image: typeof input?.image === 'string' && input.image.startsWith('https://') ? input.image.slice(0, 400) : null,
   }
 }
 
@@ -175,6 +176,10 @@ const server = http.createServer(async (req, res) => {
       const products = device?.products || []
       const pending = products.filter((product) => isPending(product.barcode)).map((product) => product.barcode)
       send(res, 200, { prices: pricesFor(products), pending })
+      return
+    }
+    if (url.pathname === '/api/specials' && req.method === 'GET') {
+      send(res, 200, { specials: listSpecials() })
       return
     }
     if (url.pathname === '/api/wallet/status' && req.method === 'GET') {

@@ -31,6 +31,7 @@ export async function syncPrices(items: ResearchedItem[]) {
         name: item.name,
         brand: item.brand,
         quantity: item.quantity,
+        image: item.image,
       })),
     }),
   })
