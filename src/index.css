@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Nunito Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-paper: #fff8ee;
+  --color-paper-deep: #fff1d2;
+  --color-ink: #143028;
+  --color-muted: #5c6b63;
+  --color-line: #f0e4cc;
+  --color-gold: #ffc20e;
+  --color-gold-deep: #e6a800;
+  --color-gold-soft: #fff4c8;
+  --color-gold-ink: #8a6400;
+  --color-pine: #0e3b2e;
+  --color-leaf: #1f7a4d;
+  --color-sale: #d92d20;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 480px at 50% -80px, #ffe8a3 0%, transparent 60%),
+    #fff4df;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+::selection {
+  background: #ffe08a;
+}
+
+.scan-line {
+  animation: scan 2.2s ease-in-out infinite;
+}
+
+@keyframes scan {
+  0% { top: 12%; }
+  50% { top: 78%; }
+  100% { top: 12%; }
+}
