@@ -71,7 +71,7 @@ export function ResearchedPage() {
           <div className="rounded-3xl bg-white px-6 py-10 text-center shadow-soft">
             <span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gold text-pine"><Icon name={onlySpecial ? 'fire' : 'basket'} size={32} /></span>
             <p className="font-display mt-4 text-2xl font-bold">{onlySpecial ? 'No bargains right now' : 'The pantry is quiet'}</p>
-            <p className="mt-2 text-sm text-muted">{onlySpecial ? 'We’ll flag it here when a checked price drops.' : 'Scan a packet and it shows up here, loud and proud.'}</p>
+            <p className="mt-2 text-sm text-muted">{onlySpecial ? 'We’ll flag it here when a checked price drops.' : 'Scan a barcode and it shows up here, loud and proud.'}</p>
           </div>
         ) : (
           <ul className="space-y-3">

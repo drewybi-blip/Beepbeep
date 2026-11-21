@@ -12,15 +12,15 @@ export function WelcomePage() {
         <p className="mx-auto mt-4 max-w-[30ch] text-center text-base text-pine/80">
           Scan a barcode. Hear the beep. See what’s in it, and what it’s selling for today.
         </p>
-        <Link to="/" className="press glow mx-auto mt-8 flex h-12 w-fit items-center rounded-full bg-gold px-6 font-extrabold text-pine">
-          Start scanning
+        <Link to="/" className="press glow mx-auto mt-8 flex h-12 w-fit items-center gap-2 rounded-full bg-gold px-6 font-extrabold text-pine">
+          <Icon name="scan" size={20} /> Scan barcode
         </Link>
       </section>
       <section className="space-y-8 px-4 pt-8">
         <h2 className="font-display text-center text-2xl font-bold">How it works</h2>
         <div className="grid gap-6">
           {[
-            ['scan', 'Scan', 'Point the camera, or snap a photo of the bars.'],
+            ['scan', 'Scan', 'Line up the barcode. We beep the moment it’s read.'],
             ['tag', 'Know', 'Ingredients, nutrition and the open catalogue it came from.'],
             ['basket', 'Save', 'Keep a list, then tick it off in the aisle.'],
           ].map(([icon, title, copy]) => (
