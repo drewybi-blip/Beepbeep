@@ -38,7 +38,7 @@ export function ScanPage() {
   const [pantry, setPantry] = useState<string>('all')
 
   useEffect(() => {
-    document.title = 'BeepBeep'
+    document.title = 'Scan, save, shop · BeepBeep'
     return () => stopRef.current?.()
   }, [])
 
@@ -163,7 +163,7 @@ export function ScanPage() {
               className="absolute inset-0 h-full w-full object-cover"
             />
             <h1 className="font-display absolute inset-x-0 top-0 flex h-1/2 flex-col items-center justify-center px-3 text-center leading-[0.92] font-extrabold tracking-tight">
-              <span className="text-[clamp(1.35rem,6.6vw,2rem)] text-pine">SCAN IT, SAVE IT…</span>
+              <span className="text-[clamp(1.7rem,8vw,2.4rem)] text-pine">SCAN, SAVE, SHOP</span>
               <span className="text-[clamp(2rem,10vw,3.25rem)] text-gold">BEEP BEEP</span>
             </h1>
           </div>

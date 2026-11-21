@@ -14,7 +14,7 @@ export default defineConfig({
         id: '/',
         name: 'BeepBeep',
         short_name: 'BeepBeep',
-        description: 'Scan a barcode, see the product, and keep a shopping list.',
+        description: 'Scan, save, shop. Beep beep.',
         lang: 'en-AU',
         dir: 'ltr',
         start_url: '/',

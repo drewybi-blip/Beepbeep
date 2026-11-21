@@ -6,11 +6,12 @@ export function WelcomePage() {
     <div className="bg-paper pb-8">
       <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top,rgba(255,205,0,0.55),transparent_58%)] px-4 pt-8 pb-12">
         <p className="text-center text-sm font-extrabold tracking-[0.2em] text-leaf">BEEPBEEP</p>
-        <h1 className="font-display mx-auto mt-6 max-w-[12ch] text-center text-[40px] leading-[0.95] font-extrabold text-pine">
-          Real prices for the real trolley
+        <h1 className="font-display mx-auto mt-6 text-center text-[40px] leading-[0.95] font-extrabold">
+          <span className="block text-pine">Scan, save, shop</span>
+          <span className="mt-2 block text-gold">Beep beep</span>
         </h1>
         <p className="mx-auto mt-4 max-w-[30ch] text-center text-base text-pine/80">
-          Scan a barcode. Hear the beep. See what’s in it, and what it’s selling for today.
+          Line up a barcode. We’ll beep, then show what’s in it and what it’s selling for today.
         </p>
         <Link to="/" className="press glow mx-auto mt-8 flex h-12 w-fit items-center gap-2 rounded-full bg-gold px-6 font-extrabold text-pine">
           <Icon name="scan" size={20} /> Scan barcode
