@@ -16,7 +16,7 @@ export const FOOD: FoodShot[] = [
   { id: 'spaghetti', alt: 'An unbranded packet of spaghetti', caption: 'Spaghetti, plain and proud', width: 864, height: 1152 },
 ]
 
-export const HERO_FOOD = ['tomatoes', 'bread', 'herbs']
+export const HERO_FOOD = ['tomatoes', 'penne', 'bread']
 
 export function foodSrc(id: string, size: 480 | 960) {
   return `/food/${id}-${size}.webp`

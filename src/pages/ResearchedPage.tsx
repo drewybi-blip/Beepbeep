@@ -33,7 +33,7 @@ export function ResearchedPage() {
       <main className="space-y-4 px-4 pb-8">
         <p className="font-semibold text-muted">Your little pantry of discoveries, saved on this phone.</p>
         <SpecialBanner records={records} />
-        {offline ? <p className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-sale">Price check is offline. Your researched products are still here.</p> : null}
+        {offline ? <p className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-pine">Price check is offline. Your researched products are still here.</p> : null}
         <div className="no-scrollbar -mx-4 flex items-center gap-2 overflow-x-auto px-4">
           <FilterPill active={!onlySpecial} icon="star" label="All" onClick={() => setOnlySpecial(false)} />
           <FilterPill active={onlySpecial} icon="fire" label={`On special${specials.length ? ` · ${specials.length}` : ''}`} onClick={() => setOnlySpecial(true)} />

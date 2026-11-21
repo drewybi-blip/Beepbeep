@@ -24,7 +24,7 @@ export function InstallHint() {
 
   return (
     <section className="rounded-[28px] bg-white p-4 shadow-[0_10px_28px_rgba(20,48,40,0.06)]">
-      <p className="sticker bg-mint px-3 py-1 text-xs font-black uppercase tracking-wide text-pine">Add BeepBeep to Home Screen</p>
+      <p className="sticker bg-gold px-3 py-1 text-xs font-black uppercase tracking-wide text-pine">Add BeepBeep to Home Screen</p>
       {prompt ? (
         <button
           type="button"

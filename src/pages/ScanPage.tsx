@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { InstallHint } from '../components/InstallHint.tsx'
 import { TopBar } from '../components/TopBar.tsx'
@@ -7,6 +7,7 @@ import { Input } from '../components/ui/input.tsx'
 import { Sheet } from '../components/ui/dialog.tsx'
 import { Icon, PANTRY, type IconName } from '../components/icons.tsx'
 import { aud, STORE_LABELS } from '../lib/format.ts'
+import { FOOD, HERO_FOOD, foodSrc, foodSrcSet, type FoodShot } from '../lib/food.ts'
 import { cameraMessage, decodeImageFile, startLiveScan } from '../lib/scan.ts'
 import { playScanBeep, unlockAudio } from '../lib/sound.ts'
 
@@ -125,7 +126,6 @@ export function ScanPage() {
   }
 
   const filtered = (specials || []).filter((item) => pantry === 'all' || matchesPantry(item.name, pantry))
-  const lead = specials?.[0]
 
   return (
     <div>
@@ -151,44 +151,43 @@ export function ScanPage() {
         </section>
       ) : (
         <>
-          <section className="bg-gold px-4 pt-6 pb-10">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <p className="tag-strip bg-white text-pine">Fresh this week</p>
-                <h1 className="font-display mt-4 text-[40px] leading-[0.95] font-extrabold tracking-tight text-pine">
-                  Scan it.<br />Save it.<br />Beep beep!
-                </h1>
-                <p className="mt-4 max-w-[28ch] text-base text-pine/80">
-                  Point at a packet. We beep, then pull the open data and today’s shelf price.
-                </p>
-              </div>
-              <span className="mascot mt-6 grid h-16 w-16 shrink-0 place-items-center rounded-3xl bg-white text-pine shadow-soft">
-                <Icon name="scan" size={36} />
-              </span>
-            </div>
-              <Button type="button" size="lg" variant="pine" className="press mt-6 w-full" onClick={() => void beginCamera()}>
-              <Icon name="scan" size={22} />
-              Start camera
-            </Button>
-            {specials?.some((item) => item.image) ? (
-              <div className="mt-8 flex items-end justify-center">
-                {specials.slice(0, 3).map((item, index) => (
-                  <Link
-                    key={item.barcode}
-                    to={`/product/${item.barcode}`}
-                    className="blob-mask -ml-6 h-28 w-24 bg-white shadow-soft first:ml-0"
-                    style={{ transform: `rotate(${index === 1 ? 0 : index === 0 ? -8 : 8}deg)` }}
-                  >
-                    {item.image ? <img src={item.image} alt="" className="h-full w-full object-contain p-2" referrerPolicy="no-referrer" /> : <span className="grid h-full place-items-center text-pine"><Icon name="basket" /></span>}
-                  </Link>
+          <section className="relative overflow-hidden px-4 pt-2 pb-2">
+            <div className="pointer-events-none absolute -top-16 right-[-48px] h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(255,205,0,0.55),transparent_68%)]" />
+            <div className="pointer-events-none absolute top-36 -left-10 h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(0,132,61,0.14),transparent_70%)]" />
+            <div className="relative">
+              <p className="tag-strip bg-white text-leaf shadow-soft">Sunny shop day</p>
+              <h1 className="font-display mt-4 text-[40px] leading-[0.95] font-extrabold tracking-tight text-pine">
+                Scan it.<br />Save it.<br />Beep beep!
+              </h1>
+              <p className="mt-4 max-w-[28ch] text-base text-pine/80">
+                Point at a packet. We’ll beep, then grab what’s in it and what it’s going for today.
+              </p>
+              <Button type="button" size="lg" className="press glow mt-6 w-full" onClick={() => void beginCamera()}>
+                <Icon name="scan" size={22} />
+                Start the camera
+              </Button>
+              <div className="mt-6 grid grid-cols-3 gap-3">
+                {HERO_FOOD.map((id, index) => (
+                  <FoodPhoto key={id} shot={FOOD.find((item) => item.id === id) as FoodShot} eager className="float-food h-28 w-full rounded-3xl object-cover shadow-soft" sizes="30vw" style={{ animationDelay: `${index * 0.6}s` }} />
                 ))}
               </div>
-            ) : null}
+            </div>
           </section>
-          <svg viewBox="0 0 390 32" className="block h-8 w-full bg-gold text-paper" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M0 16Q98 32 195 16T390 16V32H0Z" fill="currentColor" />
-          </svg>
-          <main className="space-y-8 px-4 pt-2 pb-36">
+          <main className="space-y-10 px-4 pt-6 pb-28">
+            <section>
+              <div className="mb-4">
+                <h2 className="font-display text-2xl font-extrabold">Fresh off the bench</h2>
+                <p className="mt-1 text-sm text-muted">Studio snacks. No logos, just the good stuff.</p>
+              </div>
+              <div className="no-scrollbar -mx-4 flex gap-4 overflow-x-auto px-4 pb-2">
+                {FOOD.map((shot) => (
+                  <figure key={shot.id} className="w-40 shrink-0">
+                    <FoodPhoto shot={shot} className="h-40 w-full rounded-3xl object-cover shadow-soft" sizes="160px" />
+                    <figcaption className="mt-2 text-sm font-extrabold text-pine">{shot.caption}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            </section>
             <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
               <PantryPill active={pantry === 'all'} label="All" icon="star" onClick={() => setPantry('all')} />
               {PANTRY.map((item) => (
@@ -197,30 +196,30 @@ export function ScanPage() {
             </div>
             <section>
               <div className="mb-4 flex items-end justify-between">
-                <h2 className="font-display text-2xl font-bold">Today’s specials</h2>
-                <Link to="/researched" className="text-sm font-semibold text-leaf">See all</Link>
+                <h2 className="font-display text-2xl font-extrabold">From your beeps</h2>
+                <Link to="/researched" className="text-sm font-extrabold text-leaf">Researched</Link>
               </div>
               {specials === null ? (
                 <div className="flex gap-4">
-                  <div className="h-56 w-44 animate-pulse rounded-3xl bg-white" />
-                  <div className="h-56 w-44 animate-pulse rounded-3xl bg-white" />
+                  <div className="h-40 w-40 animate-pulse rounded-3xl bg-white" />
+                  <div className="h-40 w-40 animate-pulse rounded-3xl bg-white" />
                 </div>
               ) : filtered.length === 0 ? (
                 <div className="rounded-3xl bg-white px-6 py-8 text-center shadow-soft">
                   <span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gold text-pine"><Icon name="tag" size={32} /></span>
-                  <p className="font-display mt-4 text-xl font-bold">No specials in this aisle yet</p>
-                  <p className="mt-2 text-sm text-muted">Scan a few packets. Real price drops land here. We don’t invent them.</p>
+                  <p className="font-display mt-4 text-xl font-extrabold">Nothing in this aisle yet</p>
+                  <p className="mt-2 text-sm text-muted">Your scans live in Researched. Have a beep and real price drops will turn up here. We don’t invent them.</p>
                 </div>
               ) : (
                 <div className="no-scrollbar -mx-4 flex gap-4 overflow-x-auto px-4 pb-2">
                   {filtered.map((item) => (
                     <Link key={item.barcode} to={`/product/${item.barcode}`} className="w-44 shrink-0 overflow-hidden rounded-3xl bg-white shadow-soft">
-                      <div className="blob-mask mx-3 mt-3 h-28 bg-gold-soft">
-                        {item.image ? <img src={item.image} alt="" className="h-full w-full object-contain" referrerPolicy="no-referrer" /> : null}
+                      <div className="mx-3 mt-3 h-28 overflow-hidden rounded-2xl bg-gold-soft">
+                        {item.image ? <img src={item.image} alt="" className="h-full w-full object-contain" loading="lazy" referrerPolicy="no-referrer" /> : null}
                       </div>
                       <div className="p-3">
-                        <span className="tag-strip bg-pop text-white">{item.savings ? 'Price drop' : 'On special'}</span>
-                        <p className="mt-2 line-clamp-2 font-display text-base leading-tight font-bold">{item.name}</p>
+                        <span className="tag-strip bg-leaf text-white">{item.savings ? 'Price drop' : 'On special'}</span>
+                        <p className="mt-2 line-clamp-2 font-display text-base leading-tight font-extrabold">{item.name}</p>
                         <p className="mt-2 font-display text-lg font-extrabold">{aud(item.price)}</p>
                         <p className="text-xs text-muted">{STORE_LABELS[item.store] || item.store}{item.unitPrice ? ` · ${item.unitPrice}` : ''}</p>
                       </div>
@@ -246,16 +245,8 @@ export function ScanPage() {
             </button>
             <Link to="/welcome" className="block text-sm font-semibold text-leaf">Why BeepBeep</Link>
             {busy ? <p className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold">Reading the barcode…</p> : null}
-            {error ? <p className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-sale">{error}</p> : null}
+            {error ? <p className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-pine">{error}</p> : null}
           </main>
-          {lead ? (
-            <div className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-4 bottom-[calc(5rem+env(safe-area-inset-bottom))]">
-              <Link to={`/product/${lead.barcode}`} className="flex h-12 items-center justify-between rounded-full bg-pine px-4 text-sm font-semibold text-gold shadow-soft">
-                <span className="truncate">{lead.name} · {aud(lead.price)} at {STORE_LABELS[lead.store] || lead.store}</span>
-                <span className="shrink-0">See offer</span>
-              </Link>
-            </div>
-          ) : null}
         </>
       )}
       <input ref={takeRef} className="sr-only" type="file" accept="image/*" capture="environment" onChange={(event) => void onFile(event.target.files?.[0])} />
@@ -268,6 +259,24 @@ export function ScanPage() {
         </form>
       </Sheet>
     </div>
+  )
+}
+
+function FoodPhoto({ shot, eager = false, className, sizes, style }: { shot: FoodShot; eager?: boolean; className?: string; sizes: string; style?: CSSProperties }) {
+  return (
+    <img
+      src={foodSrc(shot.id, 480)}
+      srcSet={foodSrcSet(shot.id)}
+      sizes={sizes}
+      alt={shot.alt}
+      width={shot.width}
+      height={shot.height}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
+      {...(eager ? { fetchPriority: 'high' as const } : {})}
+      className={className}
+      style={style}
+    />
   )
 }
 

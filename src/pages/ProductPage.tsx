@@ -51,7 +51,7 @@ export function ProductPage() {
           <p className="text-sm font-semibold text-gold-ink">Rummaging through the open catalogues…</p>
         </div>
       ) : null}
-      {error ? <p className="mx-4 rounded-[24px] bg-white p-5 font-bold text-sale">{error}</p> : null}
+      {error ? <p className="mx-4 rounded-[24px] bg-white p-5 font-bold text-pine">{error}</p> : null}
       {product ? <ProductView product={product} prices={prices[product.code]} pending={pending.includes(product.code)} /> : null}
       {product ? (
         <div className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-4 bottom-[calc(4.6rem+env(safe-area-inset-bottom))]">

@@ -111,7 +111,7 @@ export function ShoppingPage() {
         ) : null}
       </main>
       <div className="fixed inset-x-0 z-30 mx-auto max-w-[480px] px-4 bottom-[calc(4.6rem+env(safe-area-inset-bottom))]">
-        <div className="flex items-center justify-between rounded-full bg-pine px-5 py-3 text-gold shadow-[0_12px_30px_rgba(14,59,46,0.25)]">
+        <div className="flex items-center justify-between rounded-full bg-pine px-5 py-3 text-gold shadow-[0_12px_30px_rgba(0,87,63,0.22)]">
           <span className="font-extrabold">{open.length} to get{items.length - open.length ? ` · ${items.length - open.length} ticked` : ''}</span>
           <span className="font-extrabold">{estimate != null ? `from ${aud(estimate)}` : 'Add a scan for prices'}</span>
         </div>

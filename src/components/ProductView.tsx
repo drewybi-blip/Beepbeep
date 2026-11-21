@@ -5,7 +5,13 @@ import { aud, STORE_LABELS } from '../lib/format.ts'
 import { preferredPlace } from '../lib/prices.ts'
 import type { PriceRecord, ProductView as Product } from '../lib/types.ts'
 
-const NUTRI: Record<string, string> = { A: '#038141', B: '#85bb2f', C: '#c9a000', D: '#ee8100', E: '#e63e11' }
+const NUTRI: Record<string, { bg: string; fg: string }> = {
+  A: { bg: '#00843D', fg: '#ffffff' },
+  B: { bg: '#00573F', fg: '#FFCD00' },
+  C: { bg: '#FFCD00', fg: '#00573F' },
+  D: { bg: '#FFB81C', fg: '#00573F' },
+  E: { bg: '#00573F', fg: '#FFCD00' },
+}
 const NOVA: Record<number, string> = {
   1: 'Unprocessed',
   2: 'Culinary ingredient',
@@ -81,7 +87,7 @@ export function ProductView({ product, prices, pending }: { product: Product; pr
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {product.nutriscore ? (
-              <span className="rounded-full px-3 py-1 text-sm font-extrabold text-white" style={{ background: NUTRI[product.nutriscore.value] || '#143028' }}>
+              <span className="rounded-full px-3 py-1 text-sm font-extrabold" style={{ background: NUTRI[product.nutriscore.value]?.bg || '#00573F', color: NUTRI[product.nutriscore.value]?.fg || '#FFCD00' }}>
                 Nutri-Score {product.nutriscore.value}
               </span>
             ) : null}
@@ -105,7 +111,7 @@ export function ProductView({ product, prices, pending }: { product: Product; pr
             Open Food Facts, Open Beauty Facts, Open Pet Food Facts, Open Products Facts and UPCitemdb had no record for {product.code}.
           </p>
           {product.checkDigit === 'bad' ? (
-            <p className="mt-2 font-bold text-sale">This barcode’s check digit doesn’t match. We searched anyway.</p>
+            <p className="mt-2 font-bold text-pine">This barcode’s check digit doesn’t match. We searched anyway.</p>
           ) : null}
           <p className="mt-3 text-sm font-semibold text-muted">Australian groceries are usually listed on Open Food Facts. This one isn’t there yet.</p>
           <div className="mt-4 flex flex-wrap gap-2">
