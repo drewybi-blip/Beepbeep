@@ -29,8 +29,9 @@ export function ResearchedPage() {
 
   return (
     <div>
-      <TopBar title="Researched" />
+      <TopBar />
       <main className="space-y-4 px-4 pb-8">
+        <h1 className="font-display text-2xl font-extrabold tracking-tight">Researched</h1>
         <p className="font-semibold text-muted">Your little pantry of discoveries, saved on this phone.</p>
         <SpecialBanner records={records} />
         {offline ? <p className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-pine">Price check is offline. Your researched products are still here.</p> : null}

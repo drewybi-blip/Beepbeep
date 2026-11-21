@@ -10,7 +10,7 @@ export function Mark({ className = 'h-9 w-9' }: { className?: string }) {
   )
 }
 
-export function Wordmark() {
+export function Logo() {
   return (
     <span className="inline-flex items-center gap-2">
       <Mark className="h-9 w-9" />
@@ -20,3 +20,5 @@ export function Wordmark() {
     </span>
   )
 }
+
+export const Wordmark = Logo

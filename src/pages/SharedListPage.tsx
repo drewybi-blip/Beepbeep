@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { Confetti } from '../components/Confetti.tsx'
+import { TopBar } from '../components/TopBar.tsx'
 import { Icon } from '../components/icons.tsx'
 import { arrangeForStore } from '../lib/store-mode.ts'
 import type { ListItem } from '../lib/types.ts'
@@ -207,7 +208,9 @@ export function SharedListPage() {
   const finished = list.length > 0 && done.length === list.length
 
   return (
-    <div className="min-h-dvh bg-paper px-4 pt-6 pb-10">
+    <div className="min-h-dvh bg-paper pb-10">
+      <TopBar />
+      <div className="px-4 pt-4">
       <p className="tag-strip bg-gold text-pine">Shared list</p>
       <h1 className="font-display mt-4 text-[40px] leading-none font-extrabold text-pine">Tick it off</h1>
       <p className="mt-3 max-w-[28ch] text-base text-muted">You’re shopping from someone else’s BeepBeep list. Big ticks, no sign-up.</p>
@@ -281,6 +284,7 @@ export function SharedListPage() {
           <button type="submit" className="press h-12 rounded-full bg-leaf px-4 font-extrabold text-white">Add</button>
         </form>
       ) : null}
+      </div>
     </div>
   )
 }

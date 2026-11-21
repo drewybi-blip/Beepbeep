@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Icon } from '../components/icons.tsx'
+import { TopBar } from '../components/TopBar.tsx'
 import { arrangeForStore } from '../lib/store-mode.ts'
 import { listId, toggleItem, useLiveListSync, useShoppingList } from '../lib/shopping.ts'
 import type { ListItem } from '../lib/types.ts'
@@ -102,16 +103,17 @@ export function InStorePage() {
   }
 
   return (
-    <div className="min-h-dvh bg-paper px-4 pt-4 pb-8">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="tag-strip bg-lime text-pine">In-store mode</p>
-          <h1 className="font-display mt-4 text-[32px] leading-none font-extrabold text-pine">Tick it off</h1>
-        </div>
-        <Link to="/list" className="press rounded-full bg-white px-4 py-2 text-sm font-semibold text-pine shadow-soft">
-          Done
-        </Link>
-      </div>
+    <div className="min-h-dvh bg-paper pb-8">
+      <TopBar
+        extra={
+          <Link to="/list" className="press rounded-full bg-white px-4 py-2 text-sm font-semibold text-pine shadow-soft">
+            Done
+          </Link>
+        }
+      />
+      <div className="px-4 pt-4">
+      <p className="tag-strip bg-lime text-pine">In-store mode</p>
+      <h1 className="font-display mt-4 text-[32px] leading-none font-extrabold text-pine">Tick it off</h1>
       <p className="mt-3 text-sm font-semibold text-muted">
         {awake === 'on' ? 'Screen stays awake while you shop.' : awake === 'off' ? 'Couldn’t keep the screen awake. The list still works.' : 'This browser can’t keep the screen awake. The list still works.'}
       </p>
@@ -147,6 +149,7 @@ export function InStorePage() {
           ) : null}
         </div>
       )}
+      </div>
     </div>
   )
 }

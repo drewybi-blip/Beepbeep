@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Icon } from './icons.tsx'
+import { Logo } from './Wordmark.tsx'
 import { SoundToggle } from './SoundToggle.tsx'
-import { Wordmark } from './Wordmark.tsx'
 
-export function TopBar({ back = false, title }: { back?: boolean; title?: string }) {
+export function TopBar({ back = false, extra }: { back?: boolean; extra?: ReactNode }) {
   const navigate = useNavigate()
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-2 bg-paper/80 px-4 backdrop-blur-md">
@@ -11,14 +12,17 @@ export function TopBar({ back = false, title }: { back?: boolean; title?: string
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="press flex h-10 w-10 items-center justify-center rounded-full bg-white text-pine shadow-soft"
+          className="press flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-pine shadow-soft"
           aria-label="Back"
         >
           <Icon name="back" size={22} />
         </button>
       ) : null}
-      {title ? <h1 className="font-display text-2xl font-bold tracking-tight">{title}</h1> : <Wordmark />}
-      <SoundToggle />
+      <Logo />
+      <div className="ml-auto flex items-center gap-2">
+        {extra}
+        <SoundToggle />
+      </div>
     </header>
   )
 }

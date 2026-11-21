@@ -32,8 +32,9 @@ export function ShoppingPage() {
 
   return (
     <div>
-      <TopBar title="Shopping list" />
+      <TopBar />
       <main className="space-y-4 px-4 pb-28">
+        <h1 className="font-display text-2xl font-extrabold tracking-tight">Shopping list</h1>
         <p className="font-semibold text-muted">Tick them off as you wander the aisles. This list stays on your phone, even with no reception.</p>
         <Link to="/store" className="press flex h-14 items-center justify-center gap-2 rounded-full bg-leaf text-lg font-bold text-white shadow-[0_12px_28px_rgba(0,132,61,0.28)]">
           <Icon name="store" size={22} /> In-store mode

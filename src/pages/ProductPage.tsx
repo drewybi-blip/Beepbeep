@@ -42,7 +42,7 @@ export function ProductPage() {
 
   return (
     <div>
-      <TopBar back title="BeepBeep" />
+      <TopBar back />
       {!product && !error ? (
         <div className="space-y-4 px-4" aria-busy="true">
           <div className="h-72 animate-pulse rounded-3xl bg-white shadow-soft" />

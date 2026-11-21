@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { Icon } from '../components/icons.tsx'
+import { TopBar } from '../components/TopBar.tsx'
 
 export function WelcomePage() {
   return (
     <div className="bg-paper pb-8">
+      <TopBar />
       <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top,rgba(255,205,0,0.55),transparent_58%)] px-4 pt-8 pb-12">
-        <p className="text-center text-sm font-extrabold tracking-[0.2em] text-leaf">BEEPBEEP</p>
         <h1 className="font-display mx-auto mt-6 text-center text-[40px] leading-[0.95] font-extrabold">
           <span className="block text-pine">Scan, save, shop</span>
           <span className="mt-2 block text-gold">Beep beep</span>
