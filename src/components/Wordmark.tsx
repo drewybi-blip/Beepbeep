@@ -1,3 +1,5 @@
+import { Link, useLocation } from 'react-router-dom'
+
 export function Mark({ className = 'h-9 w-9' }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
@@ -11,13 +13,24 @@ export function Mark({ className = 'h-9 w-9' }: { className?: string }) {
 }
 
 export function Logo() {
+  const { pathname } = useLocation()
   return (
-    <span className="inline-flex items-center gap-2">
+    <Link
+      to="/"
+      aria-label="BeepBeep home"
+      className="press inline-flex items-center gap-2 rounded-xl no-underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold/50"
+      onClick={(event) => {
+        if (pathname !== '/') return
+        event.preventDefault()
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
+      }}
+    >
       <Mark className="h-9 w-9" />
       <span className="font-display text-[1.35rem] font-extrabold tracking-tight text-pine">
         Beep<span className="text-gold-deep">Beep</span>
       </span>
-    </span>
+    </Link>
   )
 }
 

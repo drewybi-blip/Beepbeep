@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { AustralianFlag } from '../components/AustralianFlag.tsx'
 import { InstallHint } from '../components/InstallHint.tsx'
 import { TopBar } from '../components/TopBar.tsx'
 import { Button } from '../components/ui/button.tsx'
@@ -215,6 +216,10 @@ export function ScanPage() {
               <Button type="button" variant="secondary" className="press w-full border-2 border-leaf bg-transparent text-leaf shadow-none ring-0" onClick={openManual}>
                 MANUAL ENTRY
               </Button>
+              <p className="mx-auto flex w-fit max-w-full items-center gap-2 rounded-full bg-white px-3 py-1.5 ring-1 ring-gold">
+                <AustralianFlag className="h-[18px] w-9 shrink-0" />
+                <span className="font-display text-[11px] leading-none font-black tracking-[0.14em] whitespace-nowrap text-pine">AUSSIE OWNED & DEVELOPED</span>
+              </p>
             </div>
             <p className="max-w-[32ch] text-base text-pine/80">
               Line up the barcode. We’ll beep, then show the product and today’s shelf price.
