@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { InstallHint } from '../components/InstallHint.tsx'
 import { SpecialBanner } from '../components/SpecialBanner.tsx'
-import { WalletButtons } from '../components/WalletButtons.tsx'
 import { TopBar } from '../components/TopBar.tsx'
 import { Button } from '../components/ui/button.tsx'
 import { Input } from '../components/ui/input.tsx'
@@ -43,7 +42,6 @@ export function ShoppingPage() {
           <Icon name="share" size={22} /> Share list
         </button>
         <InstallHint />
-        <WalletButtons />
         <SpecialBanner records={Object.values(prices)} barcodes={new Set(items.map((item) => item.barcode).filter((code): code is string => Boolean(code)))} />
         <form
           className="flex gap-2"
