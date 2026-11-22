@@ -1,0 +1,24 @@
+export function Mark({ className = 'h-9 w-9' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+      <rect width="64" height="64" rx="18" fill="#FFCD00" />
+      <rect x="14" y="18" width="6" height="28" rx="3" fill="#00843D" />
+      <rect x="24" y="12" width="8" height="40" rx="3" fill="#00573F" />
+      <rect x="36" y="20" width="5" height="24" rx="2.5" fill="#00843D" />
+      <rect x="45" y="16" width="6" height="32" rx="3" fill="#00573F" />
+    </svg>
+  )
+}
+
+export function Logo() {
+  return (
+    <span className="inline-flex items-center gap-2">
+      <Mark className="h-9 w-9" />
+      <span className="font-display text-[1.35rem] font-extrabold tracking-tight text-pine">
+        Beep<span className="text-gold-deep">Beep</span>
+      </span>
+    </span>
+  )
+}
+
+export const Wordmark = Logo

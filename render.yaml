@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: beepbeep
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: APPLE_PASS_TYPE_ID
+        sync: false
+      - key: APPLE_TEAM_ID
+        sync: false
+      - key: APPLE_PASS_CERT_PEM
+        sync: false
+      - key: APPLE_PASS_KEY_PEM
+        sync: false
+      - key: APPLE_PASS_KEY_PASSPHRASE
+        sync: false
+      - key: APPLE_WWDR_CERT_PEM
+        sync: false
+      - key: GOOGLE_WALLET_ISSUER_ID
+        sync: false
+      - key: GOOGLE_WALLET_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: GOOGLE_WALLET_CLASS_ID
+        sync: false
