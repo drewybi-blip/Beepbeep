@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { InstallHint } from '../components/InstallHint.tsx'
 import { TopBar } from '../components/TopBar.tsx'
@@ -8,6 +8,7 @@ import { Sheet } from '../components/ui/dialog.tsx'
 import { Icon, PANTRY, type IconName } from '../components/icons.tsx'
 import { aud, STORE_LABELS } from '../lib/format.ts'
 import { cameraMessage, decodeImageFile, startLiveScan } from '../lib/scan.ts'
+import { addFreeText } from '../lib/shopping.ts'
 import { playScanBeep, unlockAudio } from '../lib/sound.ts'
 
 type Special = {
@@ -30,7 +31,11 @@ export function ScanPage() {
   const stopRef = useRef<(() => void) | null>(null)
   const [live, setLive] = useState(false)
   const [manual, setManual] = useState(false)
-  const [typed, setTyped] = useState('')
+  const [itemName, setItemName] = useState('')
+  const [notice, setNotice] = useState<string | null>(null)
+  const itemRef = useRef<HTMLInputElement>(null)
+  const keyboardRef = useRef<HTMLInputElement>(null)
+  const noticeTimer = useRef(0)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pop, setPop] = useState(false)
@@ -39,7 +44,10 @@ export function ScanPage() {
 
   useEffect(() => {
     document.title = 'Scan, save, shop · BeepBeep'
-    return () => stopRef.current?.()
+    return () => {
+      stopRef.current?.()
+      window.clearTimeout(noticeTimer.current)
+    }
   }, [])
 
   useEffect(() => {
@@ -101,7 +109,7 @@ export function ScanPage() {
       const decoded = await decodeImageFile(file)
       openCode(decoded.text, true)
     } catch {
-      setError('No barcode in that picture. Get closer to the bars, or type the number.')
+      setError('No barcode in that picture. Get closer to the bars.')
     } finally {
       setBusy(false)
     }
@@ -124,6 +132,37 @@ export function ScanPage() {
   }
 
   const filtered = (specials || []).filter((item) => pantry === 'all' || matchesPantry(item.name, pantry))
+
+  function openManual() {
+    window.clearTimeout(noticeTimer.current)
+    setNotice(null)
+    setItemName('')
+    keyboardRef.current?.focus({ preventScroll: true })
+    setManual(true)
+  }
+
+  function closeManual() {
+    window.clearTimeout(noticeTimer.current)
+    setNotice(null)
+    setItemName('')
+    setManual(false)
+  }
+
+  function addNamedItem(event: FormEvent) {
+    event.preventDefault()
+    const name = itemName.trim()
+    if (!name) {
+      setItemName('')
+      itemRef.current?.focus()
+      return
+    }
+    addFreeText(name)
+    setItemName('')
+    setNotice(`Added ${name} to your list`)
+    window.clearTimeout(noticeTimer.current)
+    noticeTimer.current = window.setTimeout(() => setNotice(null), 2200)
+    itemRef.current?.focus()
+  }
 
   return (
     <div>
@@ -173,7 +212,7 @@ export function ScanPage() {
                 <Icon name="scan" size={22} />
                 SCAN BARCODE
               </Button>
-              <Button type="button" variant="secondary" className="press w-full border-2 border-leaf bg-transparent text-leaf shadow-none ring-0" onClick={() => setManual(true)}>
+              <Button type="button" variant="secondary" className="press w-full border-2 border-leaf bg-transparent text-leaf shadow-none ring-0" onClick={openManual}>
                 MANUAL ENTRY
               </Button>
             </div>
@@ -234,11 +273,34 @@ export function ScanPage() {
         </>
       )}
       <input ref={uploadRef} className="sr-only" type="file" accept="image/*" onChange={(event) => void onFile(event.target.files?.[0])} />
-      <Sheet open={manual} onOpenChange={setManual} title="Type a barcode" description="The digits under the bars, or the text in a QR code.">
-        <form className="space-y-3" onSubmit={(event) => { event.preventDefault(); openCode(typed) }}>
-          <Input value={typed} onChange={(event) => setTyped(event.target.value)} inputMode="text" autoComplete="off" autoFocus placeholder="e.g. 3017620422003" aria-label="Barcode" />
-          <Button type="submit" size="lg" className="w-full">Look it up</Button>
-          <button type="button" className="w-full py-2 text-sm font-semibold text-muted" onClick={() => openCode('3017620422003')}>Try Nutella, 3017620422003</button>
+      <input ref={keyboardRef} tabIndex={-1} aria-hidden="true" className="pointer-events-none fixed top-0 left-0 h-px w-px opacity-0" inputMode="text" autoComplete="off" />
+      <Sheet
+        open={manual}
+        onOpenChange={(open) => {
+          if (!open) closeManual()
+        }}
+        title="Add an item"
+        description="Type a name. It goes straight on your shopping list."
+        onOpenAutoFocus={(event) => {
+          event.preventDefault()
+          itemRef.current?.focus()
+        }}
+        onCloseAutoFocus={(event) => event.preventDefault()}
+      >
+        <form className="space-y-3" onSubmit={addNamedItem}>
+          <Input
+            ref={itemRef}
+            value={itemName}
+            onChange={(event) => setItemName(event.target.value)}
+            inputMode="text"
+            autoComplete="off"
+            enterKeyHint="send"
+            placeholder="e.g. milk, bananas"
+            aria-label="Item name"
+          />
+          {notice ? <p role="status" className="mx-auto w-fit max-w-full rounded-full bg-pine px-4 py-2 text-center text-sm font-extrabold break-words text-gold">{notice}</p> : null}
+          <Button type="submit" size="lg" className="press w-full">Add</Button>
+          <Button type="button" variant="secondary" className="press w-full" onClick={closeManual}>Done</Button>
         </form>
       </Sheet>
     </div>
