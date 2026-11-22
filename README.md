@@ -83,7 +83,9 @@ npm run build
 NODE_ENV=production npm start
 ```
 
-Bind the server to `0.0.0.0` and the platform’s `PORT`. `render.yaml` is a Render web service that does this. A sleeping free instance will run the catch-up refresh when it wakes, then wait for the next 06:30 Sydney.
+Bind the server to `0.0.0.0` and the platform’s `PORT`. `render.yaml` is a Render web service named `beepbeep`. Its build command is `npm install && npm run build` and its start command is `npm start`. A sleeping free instance will run the catch-up refresh when it wakes, then wait for the next 06:30 Sydney.
+
+No API keys, certificates or `.env` files are stored in this repo. Wallet credentials are read only from environment variables, and `render.yaml` declares those with `sync: false` so the values are entered in the Render dashboard.
 
 A static host can serve `dist/` on its own (`public/_redirects` sends unknown paths to `index.html`). Product lookup against Open Food Facts still works. Prices and UPCitemdb need the API, so set the app to call it by building with the API on the same origin, or host both with `npm start`.
 
